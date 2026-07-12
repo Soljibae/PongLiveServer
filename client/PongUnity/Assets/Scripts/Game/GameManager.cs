@@ -1,15 +1,15 @@
-using NUnit.Framework.Constraints;
 using UnityEngine;
 using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
-    public int leftScore { get; private set; }
-    public int rightScore { get; private set; }
+    public int LeftScore { get; private set; }
+    public int RightScore { get; private set; }
 
     [SerializeField] private int targetScore;
     [SerializeField] private int countDown;
     [SerializeField] private CountdownUI countdownUI;
+    [SerializeField] private ScoreboardUI scoreboardUI;
 
     public enum GameState
     {
@@ -23,15 +23,24 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        InitGame();
+    }
+
+    private void InitGame()
+    {
         CurrentState = GameState.Ready;
         Debug.Log(CurrentState);
 
-        leftScore = 0;
-        rightScore = 0;
+        LeftScore = 0;
+        RightScore = 0;
 
         //SpawnOBJ
 
+        WaitGame();
+    }
 
+    private void WaitGame()
+    {
         CurrentState = GameState.Waiting;
         Debug.Log(CurrentState);
 
@@ -40,9 +49,6 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator WaitingRoutine()
     {
-        CurrentState = GameState.Waiting;
-        Debug.Log(CurrentState);
-
         //yield return new WaitForSeconds(countDown);
 
         for (int i = countDown; i > 0; i--)
@@ -51,13 +57,42 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
 
-        countdownUI.Hide();
-        CurrentState = GameState.Playing;
-        Debug.Log(CurrentState);
+        StartGame();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void StartGame()
     {
+        CurrentState = GameState.Playing;
+        Debug.Log(CurrentState);
+
+        countdownUI.Hide();
+        scoreboardUI.SetScoreboardText(LeftScore, RightScore);
+
+        //activate obj
+    }
+    private void StopGame()
+    {
+        CurrentState = GameState.End;
+        Debug.Log(CurrentState);
+
+        //deactivate obj
+    }
+
+    public void AddScore(bool isLeft)
+    {
+        if (CurrentState != GameState.Playing)
+            return;
+
+        if (isLeft)
+        {
+            scoreboardUI.SetScoreboardText(++LeftScore, RightScore);
+        }
+        else
+        {
+            scoreboardUI.SetScoreboardText(LeftScore, ++RightScore);
+        }
+
+        if(LeftScore >= targetScore || RightScore >= targetScore)
+            StopGame();
     }
 }

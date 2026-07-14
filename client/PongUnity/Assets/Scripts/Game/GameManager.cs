@@ -11,6 +11,18 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CountdownUI countdownUI;
     [SerializeField] private ScoreboardUI scoreboardUI;
 
+    [SerializeField] private Paddle paddlePrefab;
+    [SerializeField] private Ball ballPrefab;
+
+    [SerializeField] private Transform leftPaddleSpawnPoint;
+    [SerializeField] private Transform rightPaddleSpawnPoint;
+    [SerializeField] private Transform ballSpawnPoint;
+
+    [SerializeField] private Transform runtimeObjectsParent;
+
+    private Paddle leftPaddle;
+    private Paddle rightPaddle;
+    private Ball ball;
     public enum GameState
     {
         Ready,
@@ -35,6 +47,8 @@ public class GameManager : MonoBehaviour
         RightScore = 0;
 
         //SpawnOBJ
+
+        ball = Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity, runtimeObjectsParent);
 
         WaitGame();
     }
@@ -69,6 +83,9 @@ public class GameManager : MonoBehaviour
         scoreboardUI.SetScoreboardText(LeftScore, RightScore);
 
         //activate obj
+        ball.SetIsPlaying(true);
+        ball.ResetBall();
+        ball.Launch();
     }
     private void StopGame()
     {
@@ -76,6 +93,7 @@ public class GameManager : MonoBehaviour
         Debug.Log(CurrentState);
 
         //deactivate obj
+        ball.SetIsPlaying(false);
     }
 
     public void AddScore(bool isLeft)

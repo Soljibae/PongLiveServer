@@ -110,7 +110,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -170,6 +170,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1786f19bf489d0f40ba8bb8ecaa92b34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  radius: 0
-  maxSpeed: 0
-  acceleration: 0
+  radius: 0.5
+  maxSpeed: 12
+  minSpeed: 8
+  speedDecay: 0.8
+  launchMaxAngle: 35
+  rigidBody: {fileID: 5637400584685773162}
+  circleCollider: {fileID: 370037928107856894}
+  spriteRenderer: {fileID: 8803037703708528565}

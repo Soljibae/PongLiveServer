@@ -12,6 +12,7 @@ public class Ball : MonoBehaviour
     [SerializeField] private float minSpeed;
     [SerializeField] private float speedDecay;
     [SerializeField, Range(0f, 75f)] private float launchMaxAngle = 35f;
+    [SerializeField, Range(0f, 75f)] private float paddleBounceMaxAngle = 70f;
 
     [SerializeField] private Rigidbody2D rigidBody;
     [SerializeField] private CircleCollider2D circleCollider;
@@ -27,15 +28,6 @@ public class Ball : MonoBehaviour
         isPlaying = false;
         currentDirection = Vector2.zero;
         currentSpeed = 0f;
-
-        if (rigidBody == null)
-            rigidBody = GetComponent<Rigidbody2D>();
-
-        if(circleCollider == null)
-            circleCollider = GetComponent<CircleCollider2D>();
-
-        if(spriteRenderer == null)
-            spriteRenderer = GetComponent<SpriteRenderer>();
 
         transform.localScale = new Vector3(radius * 2f, radius * 2f, 1f);
 
@@ -114,7 +106,23 @@ public class Ball : MonoBehaviour
 
         if (paddle != null)
         {
-            
+            float paddleHalfHeight = paddle.Height / 2;
+
+            float hitOffset = (transform.position.y - paddle.transform.position.y) / paddleHalfHeight;
+
+            hitOffset = Mathf.Clamp(hitOffset, -1f, 1f);
+
+            int xSign = transform.position.x >= paddle.transform.position.x ? 1 : -1;
+
+            float bounceAngle = hitOffset * paddleBounceMaxAngle;
+
+            float angleRad = bounceAngle * Mathf.Deg2Rad;
+
+            currentDirection = new Vector2(xSign * Mathf.Cos(angleRad), Mathf.Sin(angleRad)).normalized;
+
+            float paddleSpeedRatio = Mathf.InverseLerp(0f, paddle.MaxSpeed, Mathf.Abs(paddle.CurrentSpeed));
+
+            currentSpeed = Mathf.Lerp(minSpeed, maxSpeed, paddleSpeedRatio);
         }
         else
         {
@@ -125,11 +133,9 @@ public class Ball : MonoBehaviour
             Vector2 baseDirection = currentDirection;
 
             currentDirection = Vector2.Reflect(baseDirection, normal).normalized;
-
-            ApplyVelocity();
         }
 
-        
+        ApplyVelocity();
     }
 
     private void ApplyVelocity()

@@ -180,7 +180,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34d17d4511f542e479615faa6a65a93c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  width: 0.8
-  height: 4
+  width: 0.5
+  height: 2
   maxSpeed: 1
   acceleration: 0.3
+  rigidBody: {fileID: 5558579118237807003}
+  boxCollider: {fileID: 8169138890954737847}
+  spriteRenderer: {fileID: 2721949956060794392}

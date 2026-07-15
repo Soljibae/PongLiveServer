@@ -49,6 +49,8 @@ public class GameManager : MonoBehaviour
         //SpawnOBJ
 
         ball = Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity, runtimeObjectsParent);
+        leftPaddle = Instantiate(paddlePrefab, leftPaddleSpawnPoint.position, Quaternion.identity, runtimeObjectsParent);
+        rightPaddle = Instantiate(paddlePrefab, rightPaddleSpawnPoint.position, Quaternion.identity, runtimeObjectsParent);
 
         WaitGame();
     }

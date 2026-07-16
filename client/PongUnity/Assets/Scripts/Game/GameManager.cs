@@ -1,5 +1,6 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int countDown;
     [SerializeField] private CountdownUI countdownUI;
     [SerializeField] private ScoreboardUI scoreboardUI;
+    [SerializeField] private WinUI winUI;
 
     [SerializeField] private Paddle paddlePrefab;
     [SerializeField] private Ball ballPrefab;
@@ -60,10 +62,10 @@ public class GameManager : MonoBehaviour
         CurrentState = GameState.Waiting;
         Debug.Log(CurrentState);
 
-        StartCoroutine(WaitingRoutine());
+        StartCoroutine(CountdownWaitingRoutine());
     }
 
-    private IEnumerator WaitingRoutine()
+    private IEnumerator CountdownWaitingRoutine()
     {
         //yield return new WaitForSeconds(countDown);
 
@@ -96,6 +98,15 @@ public class GameManager : MonoBehaviour
 
         //deactivate obj
         ball.SetIsPlaying(false);
+
+        StartCoroutine(ReturnWaitingRoutine());
+    }
+
+    private IEnumerator ReturnWaitingRoutine()
+    {
+        yield return new WaitForSeconds(2f);
+
+        SceneManager.LoadScene("MainMenuScene");
     }
 
     public void AddScore(bool isLeft)
@@ -113,6 +124,13 @@ public class GameManager : MonoBehaviour
         }
 
         if(LeftScore >= targetScore || RightScore >= targetScore)
+        {
+            winUI.ShowText(isLeft);
             StopGame();
+            return;
+        }
+
+        ball.ResetBall();
+        ball.Launch();
     }
 }

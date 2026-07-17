@@ -170,11 +170,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1786f19bf489d0f40ba8bb8ecaa92b34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  radius: 0.4
-  maxSpeed: 20
-  minSpeed: 10
-  speedDecay: 2
+  radius: 0.5
+  maxSpeed: 36
+  minSpeed: 12
+  speedDecay: 4
   launchMaxAngle: 35
+  paddleBounceMaxAngle: 60
   rigidBody: {fileID: 5637400584685773162}
   circleCollider: {fileID: 370037928107856894}
   spriteRenderer: {fileID: 8803037703708528565}

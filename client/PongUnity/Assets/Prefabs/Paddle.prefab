@@ -118,7 +118,7 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
@@ -182,8 +182,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   width: 0.5
   height: 2
-  maxSpeed: 1
-  acceleration: 0.3
+  maxSpeed: 70
+  acceleration: 50
   rigidBody: {fileID: 5558579118237807003}
   boxCollider: {fileID: 8169138890954737847}
   spriteRenderer: {fileID: 2721949956060794392}

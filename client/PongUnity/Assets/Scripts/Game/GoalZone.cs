@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GoalZone : MonoBehaviour
 {
-    [SerializeField] bool isLeft;
+    [SerializeField] private PlayerSide localPlayerSide;
     [SerializeField] private GameManager gameManager;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -21,9 +21,17 @@ public class GoalZone : MonoBehaviour
     {
         Ball ball = collision.gameObject.GetComponentInParent<Ball>();
 
-        if(ball)
+        if (!ball)
+            return;
+
+        switch(localPlayerSide)
         {
-            gameManager.AddScore(isLeft);
+            case PlayerSide.Left:
+                gameManager.AddScore(false);
+                break;
+            case PlayerSide.Right:
+                gameManager.AddScore(true);
+                break;
         }
     }
 }

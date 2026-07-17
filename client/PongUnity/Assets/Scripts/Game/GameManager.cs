@@ -1,30 +1,42 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
     public int LeftScore { get; private set; }
     public int RightScore { get; private set; }
 
+    [Header("Game Setting")]
     [SerializeField] private int targetScore;
     [SerializeField] private int countDown;
+
+    [Header("UI")]
     [SerializeField] private CountdownUI countdownUI;
     [SerializeField] private ScoreboardUI scoreboardUI;
     [SerializeField] private WinUI winUI;
 
+    [Header("Prefabs")]
     [SerializeField] private Paddle paddlePrefab;
     [SerializeField] private Ball ballPrefab;
 
+    [Header("Spawn Points")]
     [SerializeField] private Transform leftPaddleSpawnPoint;
     [SerializeField] private Transform rightPaddleSpawnPoint;
     [SerializeField] private Transform ballSpawnPoint;
-
     [SerializeField] private Transform runtimeObjectsParent;
+
+    [Header("Input Controllers")]
+    [SerializeField] private KeyboardPaddleInput keyboardInput;
+
+    [SerializeField] private PlayerSide localPlayerSide = PlayerSide.Left; //로컬은 left 고정, 멀티 환경에서 수정
 
     private Paddle leftPaddle;
     private Paddle rightPaddle;
     private Ball ball;
+
+    private bool isMobile;
     public enum GameState
     {
         Ready,
@@ -48,11 +60,14 @@ public class GameManager : MonoBehaviour
         LeftScore = 0;
         RightScore = 0;
 
-        //SpawnOBJ
+        isMobile = Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer;
 
+        //SpawnOBJ
         ball = Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity, runtimeObjectsParent);
         leftPaddle = Instantiate(paddlePrefab, leftPaddleSpawnPoint.position, Quaternion.identity, runtimeObjectsParent);
         rightPaddle = Instantiate(paddlePrefab, rightPaddleSpawnPoint.position, Quaternion.identity, runtimeObjectsParent);
+
+        SetupLocalPlayerInput();
 
         WaitGame();
     }
@@ -86,18 +101,33 @@ public class GameManager : MonoBehaviour
         countdownUI.Hide();
         scoreboardUI.SetScoreboardText(LeftScore, RightScore);
 
-        //activate obj
+        if (isMobile)
+        { }
+        else
+            keyboardInput.SetInputEnabled(true);
+
+            //activate obj
         ball.SetIsPlaying(true);
         ball.ResetBall();
         ball.Launch();
+
+        leftPaddle.SetIsPlaying(true);
+        rightPaddle.SetIsPlaying(true);
     }
     private void StopGame()
     {
         CurrentState = GameState.End;
         Debug.Log(CurrentState);
 
+        if (isMobile)
+        { }
+        else
+            keyboardInput.SetInputEnabled(false);
+
         //deactivate obj
         ball.SetIsPlaying(false);
+        leftPaddle.SetIsPlaying(false);
+        rightPaddle.SetIsPlaying(false);
 
         StartCoroutine(ReturnWaitingRoutine());
     }
@@ -109,12 +139,12 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("MainMenuScene");
     }
 
-    public void AddScore(bool isLeft)
+    public void AddScore(bool scoreForLeft)
     {
         if (CurrentState != GameState.Playing)
             return;
 
-        if (isLeft)
+        if (scoreForLeft)
         {
             scoreboardUI.SetScoreboardText(++LeftScore, RightScore);
         }
@@ -125,12 +155,32 @@ public class GameManager : MonoBehaviour
 
         if(LeftScore >= targetScore || RightScore >= targetScore)
         {
-            winUI.ShowText(isLeft);
+            winUI.ShowText(scoreForLeft);
             StopGame();
             return;
         }
 
         ball.ResetBall();
         ball.Launch();
+    }
+
+    private Paddle GetLocalPlayerPaddle()
+    {
+        if (localPlayerSide == PlayerSide.Left)
+            return leftPaddle;
+
+        return rightPaddle;
+    }
+
+    private void SetupLocalPlayerInput()
+    {
+        Paddle controlledPaddle = GetLocalPlayerPaddle();
+
+        if (keyboardInput != null)
+        {
+            keyboardInput.gameObject.SetActive(true);
+
+            keyboardInput.Init(controlledPaddle, Key.W, Key.S);
+        }
     }
 }

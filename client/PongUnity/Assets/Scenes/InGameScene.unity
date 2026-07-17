@@ -144,10 +144,11 @@ Transform:
   m_GameObject: {fileID: 7515273}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 484.9101, y: 276.62225, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2053985181}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &114412319
@@ -668,7 +669,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d96d866ffa763c34f834be366df1455a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  isLeft: 1
+  localPlayerSide: 0
   gameManager: {fileID: 1090537993}
 --- !u!1 &449123949
 GameObject:
@@ -1192,8 +1193,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdc479698b0330b40a52705d3adfea93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  targetScore: 1
-  countDown: 3
+  targetScore: 11
+  countDown: 1
   countdownUI: {fileID: 114412323}
   scoreboardUI: {fileID: 179354417}
   winUI: {fileID: 958862731}
@@ -1203,6 +1204,8 @@ MonoBehaviour:
   rightPaddleSpawnPoint: {fileID: 207435964}
   ballSpawnPoint: {fileID: 353949697}
   runtimeObjectsParent: {fileID: 515596298}
+  keyboardInput: {fileID: 2053985182}
+  localPlayerSide: 0
 --- !u!4 &1090537994
 Transform:
   m_ObjectHideFlags: 0
@@ -1651,6 +1654,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2053985180
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2053985181}
+  - component: {fileID: 2053985182}
+  m_Layer: 0
+  m_Name: KeyboardPaddleInput
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2053985181
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2053985180}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7515274}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2053985182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2053985180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11777e86d8b893c498d1391af972c8f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KeyboardPaddleInput
 --- !u!1 &2144607575
 GameObject:
   m_ObjectHideFlags: 0
@@ -1803,7 +1850,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d96d866ffa763c34f834be366df1455a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GoalZone
-  isLeft: 0
+  localPlayerSide: 1
   gameManager: {fileID: 1090537993}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

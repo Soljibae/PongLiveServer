@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Input Controllers")]
     [SerializeField] private KeyboardPaddleInput keyboardInput;
-
+    [SerializeField] private MobileTouchPaddleInput mobileTouchInput;
     [SerializeField] private PlayerSide localPlayerSide = PlayerSide.Left; //로컬은 left 고정, 멀티 환경에서 수정
 
     private Paddle leftPaddle;
@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour
         RightScore = 0;
 
         isMobile = Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer;
-
+        
         //SpawnOBJ
         ball = Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity, runtimeObjectsParent);
         leftPaddle = Instantiate(paddlePrefab, leftPaddleSpawnPoint.position, Quaternion.identity, runtimeObjectsParent);
@@ -102,7 +102,7 @@ public class GameManager : MonoBehaviour
         scoreboardUI.SetScoreboardText(LeftScore, RightScore);
 
         if (isMobile)
-        { }
+            mobileTouchInput.SetInputEnabled(true);
         else
             keyboardInput.SetInputEnabled(true);
 
@@ -120,7 +120,7 @@ public class GameManager : MonoBehaviour
         Debug.Log(CurrentState);
 
         if (isMobile)
-        { }
+            mobileTouchInput.SetInputEnabled(false);
         else
             keyboardInput.SetInputEnabled(false);
 
@@ -176,11 +176,23 @@ public class GameManager : MonoBehaviour
     {
         Paddle controlledPaddle = GetLocalPlayerPaddle();
 
-        if (keyboardInput != null)
+        if(isMobile)
         {
-            keyboardInput.gameObject.SetActive(true);
+            if(mobileTouchInput != null)
+            {
+                mobileTouchInput.gameObject.SetActive(true);
 
-            keyboardInput.Init(controlledPaddle, Key.W, Key.S);
+                mobileTouchInput.Init(controlledPaddle);
+            }
+        }
+        else
+        {
+            if (keyboardInput != null)
+            {
+                keyboardInput.gameObject.SetActive(true);
+
+                keyboardInput.Init(controlledPaddle, Key.W, Key.S);
+            }
         }
     }
 }

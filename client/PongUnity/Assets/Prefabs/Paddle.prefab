@@ -182,8 +182,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   width: 0.5
   height: 2
-  maxSpeed: 70
-  acceleration: 50
+  maxSpeed: 40
+  acceleration: 60
   rigidBody: {fileID: 5558579118237807003}
   boxCollider: {fileID: 8169138890954737847}
   spriteRenderer: {fileID: 2721949956060794392}

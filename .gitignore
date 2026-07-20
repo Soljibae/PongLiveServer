@@ -76,3 +76,6 @@
 # Temporary auto-generated Android Assets
 /client/PongUnity/[Aa]ssets/[Ss]treamingAssets/aa.meta
 /client/PongUnity/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Build outputs
+/[Bb]uilds/

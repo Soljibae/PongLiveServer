@@ -1,5 +1,6 @@
-public enum PlayerSide
+public enum PlayerSide : byte
 {
+    None,
     Left,
     Right
 }

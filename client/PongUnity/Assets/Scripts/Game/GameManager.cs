@@ -39,8 +39,9 @@ public class GameManager : MonoBehaviour
     private bool isMobile;
     public enum GameState
     {
-        Ready,
+        None,
         Waiting,
+        Countdown,
         Playing,
         End
     }
@@ -54,7 +55,7 @@ public class GameManager : MonoBehaviour
 
     private void InitGame()
     {
-        CurrentState = GameState.Ready;
+        CurrentState = GameState.Waiting;
         Debug.Log(CurrentState);
 
         LeftScore = 0;
@@ -74,13 +75,13 @@ public class GameManager : MonoBehaviour
 
     private void WaitGame()
     {
-        CurrentState = GameState.Waiting;
+        CurrentState = GameState.Countdown;
         Debug.Log(CurrentState);
 
-        StartCoroutine(CountdownWaitingRoutine());
+        StartCoroutine(CountdownRoutine());
     }
 
-    private IEnumerator CountdownWaitingRoutine()
+    private IEnumerator CountdownRoutine()
     {
         //yield return new WaitForSeconds(countDown);
 
@@ -129,10 +130,10 @@ public class GameManager : MonoBehaviour
         leftPaddle.SetIsPlaying(false);
         rightPaddle.SetIsPlaying(false);
 
-        StartCoroutine(ReturnWaitingRoutine());
+        StartCoroutine(ReturnCountdownRoutine());
     }
 
-    private IEnumerator ReturnWaitingRoutine()
+    private IEnumerator ReturnCountdownRoutine()
     {
         yield return new WaitForSeconds(2f);
 

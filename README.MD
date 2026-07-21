@@ -63,7 +63,7 @@ PostgreSQL / Redis
 |---|---|---|
 | 1 | Unity 로컬 퐁 구현 | ✅ 완료 |
 | 2 | PC 입력 / 모바일 터치 입력 분리 | ✅ 완료 |
-| 3 | Netcode for GameObjects 적용 | ⬜ 예정 |
+| 3 | Netcode for GameObjects 적용 | 🟨 진행 중 |
 | 4 | Dedicated Server 실행 | ⬜ 예정 |
 | 5 | 서버 권한 공 이동 / 충돌 / 점수 처리 | ⬜ 예정 |
 | 6 | PC 클라이언트 2개 접속 테스트 | ⬜ 예정 |

@@ -1,3 +1,5 @@
+using System.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -215,6 +217,8 @@ public class NetworkGameManager : NetworkBehaviour
         Debug.Log($"Game state changed: {previousValue} -> {newValue}");
 
         RefreshGameStateUI(newValue);
+
+        ApplyGameState(newValue);
     }
 
     private void RefreshPlayerSideUI()
@@ -241,10 +245,56 @@ public class NetworkGameManager : NetworkBehaviour
                 networkInGameUI.watingText.gameObject.SetActive(true);
                 break;
             case GameState.Countdown:
-                networkInGameUI.watingText.gameObject.SetActive(false);
+                networkInGameUI.countdownUI.ShowNumber(countDown);
+                break;
+            case GameState.Playing:
+                networkInGameUI.countdownUI.gameObject.SetActive(false);
+                networkInGameUI.scoreboardUI.SetScoreboardText(0, 0);
+                break;
+            case GameState.End:
+                networkInGameUI.countdownUI.gameObject.SetActive(false);
+                //
                 break;
         }
 
         Debug.Log($"RefreshGameStateUI: {state}");
+    }
+
+    private void ApplyGameState(GameState state)
+    {
+        if (!IsServer)
+            return;
+
+        switch (state)
+        {
+            case GameState.Countdown:
+                StartCoroutine(CountdownRoutine());
+                break;
+        }
+    }
+
+    private IEnumerator CountdownRoutine()
+    {
+        //yield return new WaitForSeconds(countDown);
+
+        for (int i = countDown; i > 0; i--)
+        {
+            ShowCountdownClientRpc(i);
+            yield return new WaitForSeconds(1f);
+        }
+
+        gameState.Value = GameState.Playing;
+    }
+
+    [ClientRpc]
+    private void ShowCountdownClientRpc(int count)
+    {
+        if (!IsClient)
+            return;
+
+        if (count == 0)
+            return;
+
+        networkInGameUI.countdownUI.ShowNumber(count);
     }
 }

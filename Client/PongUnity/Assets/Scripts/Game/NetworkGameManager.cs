@@ -13,14 +13,12 @@ public class NetworkGameManager : NetworkBehaviour
     [SerializeField] private NetworkInGameUI networkInGameUI;
 
     [Header("Prefabs")]
-    [SerializeField] private Paddle paddlePrefab;
-    [SerializeField] private Ball ballPrefab;
+    [SerializeField] private NetworkBall ballPrefab;
 
     [Header("Spawn Points")]
     [SerializeField] private Transform leftPaddleSpawnPoint;
     [SerializeField] private Transform rightPaddleSpawnPoint;
     [SerializeField] private Transform ballSpawnPoint;
-    [SerializeField] private Transform runtimeObjectsParent;
 
     [Header("Input Controllers")]
     [SerializeField] private KeyboardPaddleInput keyboardInput;
@@ -40,13 +38,14 @@ public class NetworkGameManager : NetworkBehaviour
 
     private int requiredPlayerCount = 2;
 
+    private NetworkBall ball;
+
     /*
     public int LeftScore { get; private set; }
     public int RightScore { get; private set; } 
 
     private Paddle leftPaddle;
     private Paddle rightPaddle;
-    private Ball ball;
 
     private bool isMobile;
     */
@@ -77,6 +76,9 @@ public class NetworkGameManager : NetworkBehaviour
 
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+
+            ball = Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity);
+            ball.NetworkObject.Spawn();
 
             AssignAlreadyConnectedClients();
             RefreshPlayerCountAndState();
@@ -218,7 +220,7 @@ public class NetworkGameManager : NetworkBehaviour
 
         RefreshGameStateUI(newValue);
 
-        ApplyGameState(newValue);
+        ApplyGameStateServer(newValue);
     }
 
     private void RefreshPlayerSideUI()
@@ -246,6 +248,7 @@ public class NetworkGameManager : NetworkBehaviour
                 break;
             case GameState.Countdown:
                 networkInGameUI.countdownUI.ShowNumber(countDown);
+                networkInGameUI.watingText.gameObject.SetActive(false);
                 break;
             case GameState.Playing:
                 networkInGameUI.countdownUI.gameObject.SetActive(false);
@@ -260,7 +263,7 @@ public class NetworkGameManager : NetworkBehaviour
         Debug.Log($"RefreshGameStateUI: {state}");
     }
 
-    private void ApplyGameState(GameState state)
+    private void ApplyGameStateServer(GameState state)
     {
         if (!IsServer)
             return;
@@ -268,12 +271,17 @@ public class NetworkGameManager : NetworkBehaviour
         switch (state)
         {
             case GameState.Countdown:
-                StartCoroutine(CountdownRoutine());
+                StartCoroutine(CountdownRoutineServer());
+                break;
+            case GameState.Playing:
+                ball.SetIsPlayingServer(true);
+                ball.ResetBallServer();
+                ball.LaunchServer();
                 break;
         }
     }
 
-    private IEnumerator CountdownRoutine()
+    private IEnumerator CountdownRoutineServer()
     {
         //yield return new WaitForSeconds(countDown);
 

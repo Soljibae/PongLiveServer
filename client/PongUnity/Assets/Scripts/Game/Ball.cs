@@ -3,7 +3,6 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CircleCollider2D))]
-[RequireComponent(typeof(SpriteRenderer))]
 public class Ball : MonoBehaviour
 {
     [SerializeField] private float radius;
@@ -11,12 +10,11 @@ public class Ball : MonoBehaviour
     [SerializeField] private float maxSpeed;
     [SerializeField] private float minSpeed;
     [SerializeField] private float speedDecay;
-    [SerializeField, Range(0f, 75f)] private float launchMaxAngle = 35f;
-    [SerializeField, Range(0f, 75f)] private float paddleBounceMaxAngle = 70f;
+    [SerializeField, Range(0f, 75f)] private float launchMaxAngle;
+    [SerializeField, Range(0f, 75f)] private float paddleBounceMaxAngle;
 
     [SerializeField] private Rigidbody2D rigidBody;
     [SerializeField] private CircleCollider2D circleCollider;
-    [SerializeField] private SpriteRenderer spriteRenderer;
 
     private Vector2 currentDirection;
     private float currentSpeed;

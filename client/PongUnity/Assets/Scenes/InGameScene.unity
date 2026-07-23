@@ -670,7 +670,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d96d866ffa763c34f834be366df1455a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  localPlayerSide: 0
+  localPlayerSide: 1
   gameManager: {fileID: 1090537993}
 --- !u!1 &449123949
 GameObject:
@@ -1898,7 +1898,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d96d866ffa763c34f834be366df1455a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GoalZone
-  localPlayerSide: 1
+  localPlayerSide: 2
   gameManager: {fileID: 1090537993}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

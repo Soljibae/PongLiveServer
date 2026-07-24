@@ -666,7 +666,8 @@ GameObject:
   - component: {fileID: 438926071}
   - component: {fileID: 438926072}
   - component: {fileID: 438926073}
-  - component: {fileID: 438926074}
+  - component: {fileID: 438926075}
+  - component: {fileID: 438926076}
   m_Layer: 0
   m_Name: LeftGoalZone
   m_TagString: Untagged
@@ -795,7 +796,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &438926074
+--- !u!114 &438926075
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -804,11 +805,37 @@ MonoBehaviour:
   m_GameObject: {fileID: 438926070}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d96d866ffa763c34f834be366df1455a, type: 3}
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
-  localPlayerSide: 0
-  gameManager: {fileID: 0}
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 3884493933
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  <InScenePlaced>k__BackingField: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &438926076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 438926070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0d0d71846c3e11439d60698b0eba205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkGoalZone
+  ShowTopMostFoldoutHeaderGroup: 1
+  PlayerSide: 1
 --- !u!1 &449123949
 GameObject:
   m_ObjectHideFlags: 0
@@ -1387,15 +1414,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   ShowTopMostFoldoutHeaderGroup: 1
-  targetScore: 12
-  countDown: 5
+  targetScore: 2
+  countDown: 1
   networkInGameUI: {fileID: 1708219800}
+  paddlePrefab: {fileID: -4132284777799622223, guid: 0428b78d10578994bbffa793eeadb2ea, type: 3}
   ballPrefab: {fileID: 4825962050193156589, guid: 0d450e51a53e56c4aa355c9a26e58027, type: 3}
   leftPaddleSpawnPoint: {fileID: 1235466770}
   rightPaddleSpawnPoint: {fileID: 207435964}
   ballSpawnPoint: {fileID: 353949697}
   keyboardInput: {fileID: 2053985182}
   mobileTouchInput: {fileID: 503157017}
+  cameraHalfHeight: 5
 --- !u!1 &1168412359
 GameObject:
   m_ObjectHideFlags: 0
@@ -2216,7 +2245,8 @@ GameObject:
   - component: {fileID: 2144607576}
   - component: {fileID: 2144607577}
   - component: {fileID: 2144607578}
-  - component: {fileID: 2144607579}
+  - component: {fileID: 2144607580}
+  - component: {fileID: 2144607581}
   m_Layer: 0
   m_Name: RightGoalZone
   m_TagString: Untagged
@@ -2345,7 +2375,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &2144607579
+--- !u!114 &2144607580
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2354,11 +2384,37 @@ MonoBehaviour:
   m_GameObject: {fileID: 2144607575}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d96d866ffa763c34f834be366df1455a, type: 3}
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GoalZone
-  localPlayerSide: 1
-  gameManager: {fileID: 0}
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 286722961
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  <InScenePlaced>k__BackingField: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &2144607581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2144607575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0d0d71846c3e11439d60698b0eba205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkGoalZone
+  ShowTopMostFoldoutHeaderGroup: 1
+  PlayerSide: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

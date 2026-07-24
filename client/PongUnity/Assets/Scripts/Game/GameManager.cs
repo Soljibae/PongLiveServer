@@ -32,6 +32,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private MobileTouchPaddleInput mobileTouchInput;
     [SerializeField] private PlayerSide localPlayerSide = PlayerSide.Left; //로컬은 left 고정, 멀티 환경에서 수정
 
+    [Header("Camera Setting")]
+    [SerializeField] private float cameraHalfHeight = 5f;
+    public float CameraHalfHeight => cameraHalfHeight;
+
+    public static GameManager Instance { get; private set; }
+
     private Paddle leftPaddle;
     private Paddle rightPaddle;
     private Ball ball;
@@ -47,8 +53,20 @@ public class GameManager : MonoBehaviour
     }
     public GameState CurrentState { get; private set; }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    private void Awake()
+    {
+        Instance = this;
+
+        Camera mainCamera = Camera.main;
+
+        if (mainCamera != null)
+        {
+            mainCamera.orthographicSize = cameraHalfHeight;
+        }
+    }
+    
+    private void Start()
     {
         InitGame();
     }

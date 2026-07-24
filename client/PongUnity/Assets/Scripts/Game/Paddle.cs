@@ -12,7 +12,6 @@ public class Paddle : MonoBehaviour
 
     [SerializeField] private Rigidbody2D rigidBody;
     [SerializeField] private BoxCollider2D boxCollider;
-    [SerializeField] private SpriteRenderer spriteRenderer;
 
     private float maxY, minY;
 
@@ -22,7 +21,7 @@ public class Paddle : MonoBehaviour
 
     private bool isPlaying;
 
-    void Awake()
+    private void Awake()
     {
         isPlaying = false;
         CurrentSpeed = 0;
@@ -34,8 +33,11 @@ public class Paddle : MonoBehaviour
             boxCollider.size = Vector2.one;
             boxCollider.offset = Vector2.zero;
         }
+    }
 
-        float halfCameraHeight = Camera.main.orthographicSize;
+    private void Start()
+    {
+        float halfCameraHeight = GameManager.Instance.CameraHalfHeight;
 
         maxY = halfCameraHeight - height / 2;
         minY = -maxY;
@@ -53,6 +55,7 @@ public class Paddle : MonoBehaviour
 
         transform.position = currentPosition;
     }
+
     public void SetIsPlaying(bool isPlaying)
     {
         this.isPlaying = isPlaying;

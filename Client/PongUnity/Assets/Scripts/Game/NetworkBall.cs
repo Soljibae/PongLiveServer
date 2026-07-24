@@ -7,6 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(NetworkRigidbody2D))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CircleCollider2D))]
+[RequireComponent(typeof(SpriteRenderer))]
 public class NetworkBall : NetworkBehaviour
 {
     [SerializeField] private float radius;
@@ -58,6 +59,9 @@ public class NetworkBall : NetworkBehaviour
 
     public void SetIsPlayingServer(bool isPlaying)
     {
+        if (!IsServer)
+            return;
+
         this.isPlaying = isPlaying;
 
         if (rigidBody != null)
@@ -117,7 +121,7 @@ public class NetworkBall : NetworkBehaviour
         if (!IsServer)
             return;
 
-        Paddle paddle = collision.gameObject.GetComponentInParent<Paddle>();
+        NetworkPaddle paddle = collision.gameObject.GetComponentInParent<NetworkPaddle>();
 
         if (paddle != null)
         {

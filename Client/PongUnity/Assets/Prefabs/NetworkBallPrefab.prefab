@@ -267,7 +267,7 @@ MonoBehaviour:
   maxSpeed: 36
   minSpeed: 12
   speedDecay: 4
-  launchMaxAngle: 35
+  launchMaxAngle: 30
   paddleBounceMaxAngle: 60
   rigidBody: {fileID: 6843387253156150964}
   circleCollider: {fileID: 5016522834101287337}

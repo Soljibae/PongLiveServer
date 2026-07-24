@@ -13,6 +13,7 @@ public class NetworkGameManager : NetworkBehaviour
     [SerializeField] private NetworkInGameUI networkInGameUI;
 
     [Header("Prefabs")]
+    [SerializeField] private NetworkPaddle paddlePrefab;
     [SerializeField] private NetworkBall ballPrefab;
 
     [Header("Spawn Points")]
@@ -24,6 +25,9 @@ public class NetworkGameManager : NetworkBehaviour
     [SerializeField] private KeyboardPaddleInput keyboardInput;
     [SerializeField] private MobileTouchPaddleInput mobileTouchInput;
 
+    [Header("Camera Setting")]
+    [SerializeField] private float cameraHalfHeight = 5f;
+    public float CameraHalfHeight => cameraHalfHeight;
     public static NetworkGameManager Instance { get; private set; }
 
     private const ulong EmptyClientId = ulong.MaxValue;
@@ -36,19 +40,22 @@ public class NetworkGameManager : NetworkBehaviour
 
     private readonly NetworkVariable<GameState> gameState = new NetworkVariable<GameState>(GameState.None);
 
+    private readonly NetworkVariable<int> leftScore = new NetworkVariable<int>(0);
+
+    private readonly NetworkVariable<int> rightScore = new NetworkVariable<int>(0);
+
+    private readonly NetworkVariable<MatchResult> matchResult = new NetworkVariable<MatchResult>(MatchResult.None);
+
     private int requiredPlayerCount = 2;
 
+    private NetworkPaddle leftPaddle;
+    private NetworkPaddle rightPaddle;
     private NetworkBall ball;
 
     /*
-    public int LeftScore { get; private set; }
-    public int RightScore { get; private set; } 
-
-    private Paddle leftPaddle;
-    private Paddle rightPaddle;
-
     private bool isMobile;
     */
+
     public enum GameState : byte
     {
         None,
@@ -58,9 +65,25 @@ public class NetworkGameManager : NetworkBehaviour
         End
     }
 
+    public enum MatchResult : byte
+    {
+        None,
+        LeftWinByScore,
+        RightWinByScore,
+        LeftWinByForfeit,
+        RightWinByForfeit
+    }
+
     private void Awake()
     {
         Instance = this;
+
+        Camera mainCamera = Camera.main;
+
+        if (mainCamera != null)
+        {
+            mainCamera.orthographicSize = cameraHalfHeight;
+        }
     }
 
     public override void OnNetworkSpawn()
@@ -69,6 +92,9 @@ public class NetworkGameManager : NetworkBehaviour
         rightClientId.OnValueChanged += OnPlayerIdChanged;
         playerCount.OnValueChanged += OnPlayerCountChanged;
         gameState.OnValueChanged += OnGameStateChanged;
+        leftScore.OnValueChanged += OnScoreChanged;
+        rightScore.OnValueChanged += OnScoreChanged;
+        matchResult.OnValueChanged += OnMatchResultChanged;
 
         if (IsServer)
         {
@@ -78,7 +104,12 @@ public class NetworkGameManager : NetworkBehaviour
             NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
             ball = Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity);
+            leftPaddle = Instantiate(paddlePrefab, leftPaddleSpawnPoint.position, Quaternion.identity);
+            rightPaddle = Instantiate(paddlePrefab, rightPaddleSpawnPoint.position, Quaternion.identity);
+
             ball.NetworkObject.Spawn();
+            leftPaddle.NetworkObject.Spawn();
+            rightPaddle.NetworkObject.Spawn();
 
             AssignAlreadyConnectedClients();
             RefreshPlayerCountAndState();
@@ -97,6 +128,10 @@ public class NetworkGameManager : NetworkBehaviour
         rightClientId.OnValueChanged -= OnPlayerIdChanged;
         playerCount.OnValueChanged -= OnPlayerCountChanged;
         gameState.OnValueChanged -= OnGameStateChanged;
+        leftScore.OnValueChanged -= OnScoreChanged;
+        rightScore.OnValueChanged -= OnScoreChanged;
+        matchResult.OnValueChanged -= OnMatchResultChanged;
+
 
         if (NetworkManager.Singleton == null)
             return;
@@ -218,9 +253,27 @@ public class NetworkGameManager : NetworkBehaviour
     {
         Debug.Log($"Game state changed: {previousValue} -> {newValue}");
 
-        RefreshGameStateUI(newValue);
-
         ApplyGameStateServer(newValue);
+
+        RefreshGameStateUI(newValue);
+    }
+
+    private void OnScoreChanged(int previousValue, int newValue)
+    {
+        RefreshScoreboardUI();
+    }
+    private void OnMatchResultChanged(MatchResult previousValue, MatchResult newValue)
+    {
+        Debug.Log($"Match Resule: {newValue}");
+
+
+        if (!IsClient)
+            return;
+
+        if (gameState.Value == GameState.End)
+        {
+            RefreshGameStateUI(gameState.Value);
+        }
     }
 
     private void RefreshPlayerSideUI()
@@ -234,6 +287,14 @@ public class NetworkGameManager : NetworkBehaviour
         networkInGameUI.rightPlayerName.gameObject.SetActive(mySide == PlayerSide.Right);
 
         Debug.Log($"PlayerSide UI On localSide : {mySide}");
+    }
+
+    private void RefreshScoreboardUI()
+    {
+        if (!IsClient)
+            return;
+
+        networkInGameUI.scoreboardUI.SetScoreboardText(leftScore.Value, rightScore.Value);
     }
 
     private void RefreshGameStateUI(GameState state)
@@ -256,7 +317,21 @@ public class NetworkGameManager : NetworkBehaviour
                 break;
             case GameState.End:
                 networkInGameUI.countdownUI.gameObject.SetActive(false);
-                //
+                switch(matchResult.Value)
+                {
+                    case MatchResult.LeftWinByScore:
+                        networkInGameUI.winUI.ShowText(true);
+                        break;
+                    case MatchResult.RightWinByScore:
+                        networkInGameUI.winUI.ShowText(false);
+                        break;
+                    case MatchResult.LeftWinByForfeit:
+                        networkInGameUI.winUI.ShowText(true);
+                        break;
+                    case MatchResult.RightWinByForfeit:
+                        networkInGameUI.winUI.ShowText(false);
+                        break;
+                }
                 break;
         }
 
@@ -268,6 +343,8 @@ public class NetworkGameManager : NetworkBehaviour
         if (!IsServer)
             return;
 
+        Debug.Log(state);
+
         switch (state)
         {
             case GameState.Countdown:
@@ -277,6 +354,13 @@ public class NetworkGameManager : NetworkBehaviour
                 ball.SetIsPlayingServer(true);
                 ball.ResetBallServer();
                 ball.LaunchServer();
+                leftPaddle.SetIsPlayingServer(true);
+                rightPaddle.SetIsPlayingServer(true);
+                break;
+            case GameState.End:
+                ball.SetIsPlayingServer(false);
+                leftPaddle.SetIsPlayingServer(false);
+                rightPaddle.SetIsPlayingServer(false);
                 break;
         }
     }
@@ -304,5 +388,50 @@ public class NetworkGameManager : NetworkBehaviour
             return;
 
         networkInGameUI.countdownUI.ShowNumber(count);
+    }
+
+    public void AddScoreServer(bool scoreForLeft)
+    {
+        if (!IsServer)
+            return;
+
+        if (gameState.Value != GameState.Playing)
+            return;
+
+        if (scoreForLeft)
+        {
+            leftScore.Value++;
+
+            if (leftScore.Value >= targetScore)
+            {
+                EndMatchServer(MatchResult.LeftWinByScore);
+                return;
+            }
+        }
+        else
+        {
+            rightScore.Value++;
+
+            if (rightScore.Value >= targetScore)
+            {
+                EndMatchServer(MatchResult.RightWinByScore);
+                return;
+            }
+        }
+
+        ball.ResetBallServer();
+        ball.LaunchServer();
+    }
+
+    private void EndMatchServer(MatchResult result)
+    {
+        if (!IsServer)
+            return;
+
+        if (gameState.Value == GameState.End)
+            return;
+
+        matchResult.Value = result;
+        gameState.Value = GameState.End;
     }
 }

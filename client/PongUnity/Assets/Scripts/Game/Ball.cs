@@ -3,6 +3,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CircleCollider2D))]
+[RequireComponent(typeof(SpriteRenderer))]
 public class Ball : MonoBehaviour
 {
     [SerializeField] private float radius;

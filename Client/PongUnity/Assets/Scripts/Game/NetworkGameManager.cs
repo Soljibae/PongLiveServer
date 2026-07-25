@@ -46,6 +46,8 @@ public class NetworkGameManager : NetworkBehaviour
 
     private readonly NetworkVariable<MatchResult> matchResult = new NetworkVariable<MatchResult>(MatchResult.None);
 
+    private ConnectionApprovalHandler connectionApprovalHandler;
+
     private int requiredPlayerCount = 2;
 
     private NetworkPaddle leftPaddle;
@@ -98,6 +100,8 @@ public class NetworkGameManager : NetworkBehaviour
 
         if (IsServer)
         {
+            connectionApprovalHandler = NetworkManager.Singleton.GetComponent<ConnectionApprovalHandler>();
+
             gameState.Value = GameState.Waiting;
 
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
@@ -178,24 +182,25 @@ public class NetworkGameManager : NetworkBehaviour
 
         GameState stateBeforeDisconnect = gameState.Value;
 
-        bool opponentExists;
-
         if (leftDisconnected)
         {
-            opponentExists = rightClientId.Value != EmptyClientId;
             leftClientId.Value = EmptyClientId;
         }
         else
         {
-            opponentExists = leftClientId.Value != EmptyClientId;
             rightClientId.Value = EmptyClientId;
         }
 
-        if (stateBeforeDisconnect == GameState.Playing && opponentExists)
+        if (stateBeforeDisconnect == GameState.Countdown)
         {
-            MatchResult result = leftDisconnected
-                ? MatchResult.RightWinByForfeit
-                : MatchResult.LeftWinByForfeit;
+            RefreshPlayerCountAndState();
+            connectionApprovalHandler?.OpenMatchServer();
+            return;
+        }
+
+        if (stateBeforeDisconnect == GameState.Playing)
+        {
+            MatchResult result = leftDisconnected ? MatchResult.RightWinByForfeit : MatchResult.LeftWinByForfeit;
 
             EndMatchServer(result);
 
@@ -342,6 +347,7 @@ public class NetworkGameManager : NetworkBehaviour
         {
             case GameState.Waiting:
                 networkInGameUI.watingText.gameObject.SetActive(true);
+                networkInGameUI.countdownUI.gameObject.SetActive(false);
                 break;
             case GameState.Countdown:
                 networkInGameUI.countdownUI.ShowNumber(countDown);

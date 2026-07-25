@@ -167,7 +167,43 @@ public class NetworkGameManager : NetworkBehaviour
 
     private void OnClientDisconnected(ulong clientId)
     {
-        //ºÎÀü½Â ·ÎÁ÷
+        if (!IsServer)
+            return;
+
+        bool leftDisconnected = leftClientId.Value == clientId;
+        bool rightDisconnected = rightClientId.Value == clientId;
+
+        if (!leftDisconnected && !rightDisconnected)
+            return;
+
+        GameState stateBeforeDisconnect = gameState.Value;
+
+        bool opponentExists;
+
+        if (leftDisconnected)
+        {
+            opponentExists = rightClientId.Value != EmptyClientId;
+            leftClientId.Value = EmptyClientId;
+        }
+        else
+        {
+            opponentExists = leftClientId.Value != EmptyClientId;
+            rightClientId.Value = EmptyClientId;
+        }
+
+        if (stateBeforeDisconnect == GameState.Playing && opponentExists)
+        {
+            MatchResult result = leftDisconnected
+                ? MatchResult.RightWinByForfeit
+                : MatchResult.LeftWinByForfeit;
+
+            EndMatchServer(result);
+
+            playerCount.Value = 1;
+            return;
+        }
+
+        RefreshPlayerCountAndState();
     }
 
     private void AssignPlayer(ulong clientId)
@@ -371,11 +407,17 @@ public class NetworkGameManager : NetworkBehaviour
 
         for (int i = countDown; i > 0; i--)
         {
+            if (gameState.Value != GameState.Countdown)
+                yield break;
+
             ShowCountdownClientRpc(i);
             yield return new WaitForSeconds(1f);
         }
 
-        gameState.Value = GameState.Playing;
+        if (gameState.Value == GameState.Countdown)
+        {
+            gameState.Value = GameState.Playing;
+        }
     }
 
     [ClientRpc]

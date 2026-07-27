@@ -9,6 +9,7 @@ public class KeyboardPaddleInput : MonoBehaviour
 
     private bool isInputEnabled;
     private float currentInput;
+
     public void Init(Paddle paddle, Key up, Key down)
     {
         targetPaddle = paddle;

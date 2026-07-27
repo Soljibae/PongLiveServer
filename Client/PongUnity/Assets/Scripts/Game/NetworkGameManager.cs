@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using UnityEngine;
@@ -15,6 +16,7 @@ public class NetworkGameManager : NetworkBehaviour
     [Header("Prefabs")]
     [SerializeField] private NetworkPaddle paddlePrefab;
     [SerializeField] private NetworkBall ballPrefab;
+    [SerializeField] private NetworkObject paddleControllerPrefab;
 
     [Header("Spawn Points")]
     [SerializeField] private Transform leftPaddleSpawnPoint;
@@ -47,6 +49,8 @@ public class NetworkGameManager : NetworkBehaviour
     private readonly NetworkVariable<MatchResult> matchResult = new NetworkVariable<MatchResult>(MatchResult.None);
 
     private ConnectionApprovalHandler connectionApprovalHandler;
+
+    private readonly Dictionary<ulong, NetworkObject> spawnedControllers = new();
 
     private int requiredPlayerCount = 2;
 
@@ -185,11 +189,15 @@ public class NetworkGameManager : NetworkBehaviour
         if (leftDisconnected)
         {
             leftClientId.Value = EmptyClientId;
+            leftPaddle.ResetPositionServer();
         }
         else
         {
             rightClientId.Value = EmptyClientId;
+            rightPaddle.ResetPositionServer();
         }
+
+        spawnedControllers.Remove(clientId);
 
         if (stateBeforeDisconnect == GameState.Countdown)
         {
@@ -223,6 +231,8 @@ public class NetworkGameManager : NetworkBehaviour
         {
             leftClientId.Value = clientId;
             Debug.Log($"Client {clientId} assigned to Left.");
+            leftPaddle.NetworkObject.ChangeOwnership(clientId);
+            SpawnController(clientId, leftPaddle);
             return;
         }
 
@@ -230,11 +240,32 @@ public class NetworkGameManager : NetworkBehaviour
         {
             rightClientId.Value = clientId;
             Debug.Log($"Client {clientId} assigned to Right.");
+            rightPaddle.NetworkObject.ChangeOwnership(clientId);
+            SpawnController(clientId, rightPaddle);
             return;
         }
 
         Debug.LogWarning($"Room is full. Client {clientId} cannot be assigned.");
         NetworkManager.Singleton.DisconnectClient(clientId);
+    }
+
+    private void SpawnController(ulong clientId, NetworkPaddle targetPaddle)
+    {
+        if (!IsServer)
+            return;
+
+        if (spawnedControllers.ContainsKey(clientId))
+            return;
+
+        NetworkObject controllerObject = Instantiate(paddleControllerPrefab);
+
+        controllerObject.SpawnWithOwnership(clientId);
+
+        NetworkMobileTouchPaddleInput mobileInput = controllerObject.GetComponent<NetworkMobileTouchPaddleInput>();
+
+        mobileInput.ConfigureTargetPaddleServer(targetPaddle);
+
+        spawnedControllers.Add(clientId, controllerObject);
     }
 
     private void RefreshPlayerCountAndState()
@@ -398,12 +429,38 @@ public class NetworkGameManager : NetworkBehaviour
                 ball.LaunchServer();
                 leftPaddle.SetIsPlayingServer(true);
                 rightPaddle.SetIsPlayingServer(true);
+                SetAllControllerInputEnabled(true);
                 break;
             case GameState.End:
                 ball.SetIsPlayingServer(false);
                 leftPaddle.SetIsPlayingServer(false);
                 rightPaddle.SetIsPlayingServer(false);
+                SetAllControllerInputEnabled(false);
                 break;
+        }
+    }
+
+    public void SetAllControllerInputEnabled(bool enabled)
+    {
+        if (!IsServer)
+            return;
+
+        foreach (NetworkObject controllerObject in spawnedControllers.Values)
+        {
+            if (controllerObject == null)
+                continue;
+
+            if (!controllerObject.IsSpawned)
+                continue;
+
+            if (!controllerObject.TryGetComponent(out NetworkControllerManager controller))
+            {
+                Debug.LogError("NetworkControllerManager not found", controllerObject);
+
+                continue;
+            }
+
+            controller.SetInputEnabledServer(enabled);
         }
     }
 
@@ -481,5 +538,22 @@ public class NetworkGameManager : NetworkBehaviour
 
         matchResult.Value = result;
         gameState.Value = GameState.End;
+    }
+
+    public void SetPlayerInput(ulong clientId, float input)
+    {
+        if (!IsServer)
+            return;
+
+        input = Mathf.Clamp(input, -1f, 1f);
+
+        if (clientId == leftClientId.Value)
+        {
+            leftPaddle.MoveServer(input);
+        }
+        else if (clientId == rightClientId.Value)
+        {
+            rightPaddle.MoveServer(input);
+        }
     }
 }

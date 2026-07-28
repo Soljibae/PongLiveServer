@@ -10,6 +10,7 @@ public class NetworkGameManager : NetworkBehaviour
     [Header("Game Setting")]
     [SerializeField] private int targetScore;
     [SerializeField] private int countDown;
+    [SerializeField] private float serverShutdownDelay = 5f;
 
     [Header("UI")]
     [SerializeField] private NetworkInGameUI networkInGameUI;
@@ -48,6 +49,8 @@ public class NetworkGameManager : NetworkBehaviour
     private ConnectionApprovalHandler connectionApprovalHandler;
 
     private readonly Dictionary<ulong, NetworkObject> spawnedControllers = new();
+
+    private Coroutine serverShutdownRoutine;
 
     private int requiredPlayerCount = 2;
 
@@ -228,7 +231,7 @@ public class NetworkGameManager : NetworkBehaviour
         {
             leftClientId.Value = clientId;
             Debug.Log($"Client {clientId} assigned to Left.");
-            leftPaddle.NetworkObject.ChangeOwnership(clientId);
+            //leftPaddle.NetworkObject.ChangeOwnership(clientId);
             SpawnController(clientId, leftPaddle);
             return;
         }
@@ -237,7 +240,7 @@ public class NetworkGameManager : NetworkBehaviour
         {
             rightClientId.Value = clientId;
             Debug.Log($"Client {clientId} assigned to Right.");
-            rightPaddle.NetworkObject.ChangeOwnership(clientId);
+            //rightPaddle.NetworkObject.ChangeOwnership(clientId);
             SpawnController(clientId, rightPaddle);
             return;
         }
@@ -441,6 +444,7 @@ public class NetworkGameManager : NetworkBehaviour
                 leftPaddle.SetIsPlayingServer(false);
                 rightPaddle.SetIsPlayingServer(false);
                 SetAllControllerInputEnabled(false);
+                StartServerShutdownRoutine();
                 break;
         }
     }
@@ -561,18 +565,43 @@ public class NetworkGameManager : NetworkBehaviour
             rightPaddle.MoveServer(input);
         }
     }
+
     public void LeaveMatch()
     {
-        NetworkManager networkManager = NetworkManager.Singleton;
-
-        if (networkManager == null)
+        if (NetworkManager == null)
             return;
 
-        if (!networkManager.IsListening)
+        if (!NetworkManager.IsListening)
             return;
 
-        networkManager.Shutdown();
+        NetworkManager.Shutdown();
 
-        SceneManager.LoadScene("MainMenuScene");
+        //SceneManager.LoadScene("MainMenuScene");
+    }
+
+    private void StartServerShutdownRoutine()
+    {
+        if (!IsServer)
+            return;
+
+        if (serverShutdownRoutine != null)
+            return;
+
+        serverShutdownRoutine = StartCoroutine(ServerShutdownRoutine());
+    }
+
+    private IEnumerator ServerShutdownRoutine()
+    {
+        yield return new WaitForSecondsRealtime(serverShutdownDelay);
+
+        serverShutdownRoutine = null;
+
+        if (NetworkManager == null)
+            yield break;
+
+        if (!NetworkManager.IsListening)
+            yield break;
+
+        NetworkManager.Shutdown();
     }
 }

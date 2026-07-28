@@ -1728,8 +1728,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   ShowTopMostFoldoutHeaderGroup: 1
-  targetScore: 12
+  targetScore: 1
   countDown: 5
+  serverShutdownDelay: 5
   networkInGameUI: {fileID: 1708219800}
   paddlePrefab: {fileID: -4132284777799622223, guid: 0428b78d10578994bbffa793eeadb2ea, type: 3}
   ballPrefab: {fileID: 4825962050193156589, guid: 0d450e51a53e56c4aa355c9a26e58027, type: 3}

@@ -93,6 +93,9 @@ public class NetworkMobileTouchPaddleInput : NetworkBehaviour
         if (!isInputEnabled)
             return;
 
+        if (Keyboard.current?.escapeKey.wasPressedThisFrame == true)
+            NetworkGameManager.Instance.ToggleLeaveUIState();
+
         if (targetPaddle == null)
             return;
 

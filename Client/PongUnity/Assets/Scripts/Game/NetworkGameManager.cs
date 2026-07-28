@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NetworkGameManager : NetworkBehaviour
 {
@@ -22,10 +23,6 @@ public class NetworkGameManager : NetworkBehaviour
     [SerializeField] private Transform leftPaddleSpawnPoint;
     [SerializeField] private Transform rightPaddleSpawnPoint;
     [SerializeField] private Transform ballSpawnPoint;
-
-    [Header("Input Controllers")]
-    [SerializeField] private KeyboardPaddleInput keyboardInput;
-    [SerializeField] private MobileTouchPaddleInput mobileTouchInput;
 
     [Header("Camera Setting")]
     [SerializeField] private float cameraHalfHeight = 5f;
@@ -369,6 +366,14 @@ public class NetworkGameManager : NetworkBehaviour
         networkInGameUI.scoreboardUI.SetScoreboardText(leftScore.Value, rightScore.Value);
     }
 
+    public void ToggleLeaveUIState()
+    {
+        if (!IsClient)
+            return;
+
+        networkInGameUI.leaveUI.gameObject.SetActive(!networkInGameUI.leaveUI.gameObject.activeSelf);
+    }
+
     private void RefreshGameStateUI(GameState state)
     {
         if (!IsClient)
@@ -555,5 +560,19 @@ public class NetworkGameManager : NetworkBehaviour
         {
             rightPaddle.MoveServer(input);
         }
+    }
+    public void LeaveMatch()
+    {
+        NetworkManager networkManager = NetworkManager.Singleton;
+
+        if (networkManager == null)
+            return;
+
+        if (!networkManager.IsListening)
+            return;
+
+        networkManager.Shutdown();
+
+        SceneManager.LoadScene("MainMenuScene");
     }
 }

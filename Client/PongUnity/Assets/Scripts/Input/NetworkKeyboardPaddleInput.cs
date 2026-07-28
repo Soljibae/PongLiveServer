@@ -6,6 +6,7 @@ public class NetworkKeyboardPaddleInput : NetworkBehaviour
 {
     [SerializeField] private Key upKey = Key.W;
     [SerializeField] private Key downKey = Key.S;
+    [SerializeField] private Key leaveKey = Key.Escape;
 
     private bool isInputEnabled;
     private float currentInput;
@@ -33,6 +34,12 @@ public class NetworkKeyboardPaddleInput : NetworkBehaviour
             return;
 
         currentInput = 0f;
+
+        if (Keyboard.current == null)
+            return;
+
+        if (Keyboard.current[leaveKey].wasPressedThisFrame)
+            NetworkGameManager.Instance.ToggleLeaveUIState();
 
         if (!isInputEnabled)
             return;

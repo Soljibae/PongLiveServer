@@ -9,7 +9,7 @@ public class NetworkInGameUI : MonoBehaviour
     [SerializeField] public CountdownUI countdownUI;
     [SerializeField] public ScoreboardUI scoreboardUI;
     [SerializeField] public WinUI winUI;
-
+    [SerializeField] public LeaveUI leaveUI;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

@@ -13,7 +13,6 @@ public class ConnectionApprovalHandler : MonoBehaviour
     private void Awake()
     {
         networkManager.ConnectionApprovalCallback = ApprovalCheck;
-        networkManager.OnClientConnectedCallback += OnClientConnected;
     }
 
     private void OnDestroy()
@@ -22,7 +21,6 @@ public class ConnectionApprovalHandler : MonoBehaviour
             return;
 
         networkManager.ConnectionApprovalCallback = null;
-        networkManager.OnClientConnectedCallback -= OnClientConnected;
     }
 
     private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
@@ -32,22 +30,11 @@ public class ConnectionApprovalHandler : MonoBehaviour
         bool canJoin = !isMatchLocked && connectedPlayerCount < maxPlayerCount;
 
         response.Approved = canJoin;
-        response.CreatePlayerObject = canJoin;
+        response.CreatePlayerObject = false;
         response.Pending = false;
         response.Reason = canJoin ? string.Empty : "The match is full or already in progress.";
 
         Debug.Log($"ApprovalCheck | " + $"ClientId: {request.ClientNetworkId}, " + $"Connected: {connectedPlayerCount}, " + $"Approved: {canJoin}");
-    }
-
-    private void OnClientConnected(ulong clientId)
-    {
-        if (!networkManager.IsServer)
-            return;
-
-        if (networkManager.ConnectedClientsIds.Count >= maxPlayerCount)
-        {
-            CloseMatchServer();
-        }
     }
 
     public void OpenMatchServer()

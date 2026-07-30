@@ -1,12 +1,16 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.Netcode.Transports.UTP;
 
 public class NetworkStartUI : MonoBehaviour
 {
-    private bool shouldLoadGameScene;
+    [Header("Client Connection Settings")]
+    [SerializeField] private string serverAddress = "127.0.0.1";
+    [SerializeField] private ushort serverPort = 7777;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [SerializeField] private UnityTransport unityTransport;
+
     void Start()
     {
         if (NetworkManager.Singleton == null)
@@ -17,7 +21,7 @@ public class NetworkStartUI : MonoBehaviour
 
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
-        NetworkManager.Singleton.OnServerStarted += OnServerStarted;
+        //NetworkManager.Singleton.OnServerStarted += OnServerStarted;
     }
 
     private void OnDestroy()
@@ -27,38 +31,52 @@ public class NetworkStartUI : MonoBehaviour
 
         NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
-        NetworkManager.Singleton.OnServerStarted -= OnServerStarted;
-    }
-
-    public void StartHost()
-    {
-        shouldLoadGameScene = true;
-
-        bool result = NetworkManager.Singleton.StartHost();
-
-        if (!result)
-            shouldLoadGameScene = false;
-
-
-        Debug.Log($"StartHost result: {result}");
+        //NetworkManager.Singleton.OnServerStarted -= OnServerStarted;
     }
 
     public void StartClient()
     {
-        bool result = NetworkManager.Singleton.StartClient();
-
-        Debug.Log($"StartClient result: {result}");
+        bool result = Connect(serverAddress, serverPort);
     }
 
-    private void OnServerStarted()
+    public bool Connect(string address, ushort port)
     {
-        Debug.Log("Server started.");
+        NetworkManager networkManager = NetworkManager.Singleton;
 
-        if (shouldLoadGameScene)
+        if (networkManager == null)
         {
-            NetworkManager.Singleton.SceneManager.LoadScene("NetworkGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
-            Debug.Log("Load Scene.");
-        }      
+            Debug.LogError("NetworkManager is missing.");
+            return false;
+        }
+
+        if (networkManager.IsListening)
+        {
+            Debug.LogWarning("NetworkManager is already running.");
+
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(address))
+        {
+            Debug.LogError("Server address is empty.");
+            return false;
+        }
+
+        if (unityTransport == null)
+        {
+            Debug.LogError("UnityTransport is missing.");
+            return false;
+        }
+
+        string trimmedAddress = address.Trim();
+
+        unityTransport.SetConnectionData(trimmedAddress, port);
+
+        bool result = networkManager.StartClient();
+
+        Debug.Log($"StartClient result: {result}, " + $"Server: {trimmedAddress}:{port}");
+
+        return result;
     }
 
     private void OnClientConnected(ulong clientId)
@@ -80,4 +98,28 @@ public class NetworkStartUI : MonoBehaviour
         Debug.Log($"Client disconnected. ClientId: {clientId}");
         Debug.Log($"Client ¿¬°á ²÷±è: {clientId}");
     }
+
+    //private bool shouldLoadGameScene;
+
+    //public void StartHost()
+    //{
+    //    shouldLoadGameScene = true;
+
+    //    bool result = NetworkManager.Singleton.StartHost();
+
+    //    if (!result)
+    //        shouldLoadGameScene = false;
+
+    //    Debug.Log($"StartHost result: {result}");
+    //}
+    //private void OnServerStarted()
+    //{
+    //    Debug.Log("Server started.");
+
+    //    if (shouldLoadGameScene)
+    //    {
+    //        NetworkManager.Singleton.SceneManager.LoadScene("NetworkGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+    //        Debug.Log("Load Scene.");
+    //    }
+    //}
 }

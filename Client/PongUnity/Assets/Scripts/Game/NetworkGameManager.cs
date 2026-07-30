@@ -199,10 +199,15 @@ public class NetworkGameManager : NetworkBehaviour
 
         spawnedControllers.Remove(clientId);
 
+        if (stateBeforeDisconnect == GameState.End)
+        {
+            return;
+        }
+
+
         if (stateBeforeDisconnect == GameState.Countdown)
         {
             RefreshPlayerCountAndState();
-            connectionApprovalHandler?.OpenMatchServer();
             return;
         }
 
@@ -429,9 +434,11 @@ public class NetworkGameManager : NetworkBehaviour
         switch (state)
         {
             case GameState.Countdown:
+                connectionApprovalHandler?.OpenMatchServer();
                 StartCoroutine(CountdownRoutineServer());
                 break;
             case GameState.Playing:
+                connectionApprovalHandler?.CloseMatchServer();
                 ball.SetIsPlayingServer(true);
                 ball.ResetBallServer();
                 ball.LaunchServer();

@@ -1,3 +1,4 @@
+using NUnit.Framework.Internal.Execution;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections.LowLevel.Unsafe;
@@ -50,17 +51,15 @@ public class NetworkGameManager : NetworkBehaviour
 
     private readonly Dictionary<ulong, NetworkObject> spawnedControllers = new();
 
-    private Coroutine serverShutdownRoutine;
+    private bool hasHadPlayer = false;
+
+    private DedicatedServerBootstrap dedicatedServerBootstrap;
 
     private int requiredPlayerCount = 2;
 
     private NetworkPaddle leftPaddle;
     private NetworkPaddle rightPaddle;
     private NetworkBall ball;
-
-    /*
-    private bool isMobile;
-    */
 
     public enum GameState : byte
     {
@@ -105,6 +104,8 @@ public class NetworkGameManager : NetworkBehaviour
         if (IsServer)
         {
             connectionApprovalHandler = NetworkManager.Singleton.GetComponent<ConnectionApprovalHandler>();
+
+            dedicatedServerBootstrap = NetworkManager.Singleton.GetComponent<DedicatedServerBootstrap>();
 
             gameState.Value = GameState.Waiting;
 
@@ -167,6 +168,8 @@ public class NetworkGameManager : NetworkBehaviour
         if (!IsServer)
             return;
 
+        hasHadPlayer = true;
+
         Debug.Log($"Client connected: {clientId}");
 
         AssignPlayer(clientId);
@@ -203,7 +206,6 @@ public class NetworkGameManager : NetworkBehaviour
         {
             return;
         }
-
 
         if (stateBeforeDisconnect == GameState.Countdown)
         {
@@ -582,8 +584,6 @@ public class NetworkGameManager : NetworkBehaviour
             return;
 
         NetworkManager.Shutdown();
-
-        //SceneManager.LoadScene("MainMenuScene");
     }
 
     private void StartServerShutdownRoutine()
@@ -591,17 +591,12 @@ public class NetworkGameManager : NetworkBehaviour
         if (!IsServer)
             return;
 
-        if (serverShutdownRoutine != null)
-            return;
-
-        serverShutdownRoutine = StartCoroutine(ServerShutdownRoutine());
+        StartCoroutine(ServerShutdownRoutine());
     }
 
     private IEnumerator ServerShutdownRoutine()
     {
         yield return new WaitForSecondsRealtime(serverShutdownDelay);
-
-        serverShutdownRoutine = null;
 
         if (NetworkManager == null)
             yield break;
@@ -609,6 +604,8 @@ public class NetworkGameManager : NetworkBehaviour
         if (!NetworkManager.IsListening)
             yield break;
 
-        NetworkManager.Shutdown();
+        Debug.Log("Match ended. Shutting down server.");
+
+        dedicatedServerBootstrap.ShutdownDedicatedServer();
     }
 }

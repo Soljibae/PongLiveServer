@@ -17,6 +17,7 @@ public class DedicatedServerBootstrap : MonoBehaviour
 #if UNITY_SERVER
 
     private ushort currentPort;
+    private bool isShuttingDown = false;
 
     private void Start()
     {
@@ -88,6 +89,25 @@ public class DedicatedServerBootstrap : MonoBehaviour
         }
 
         return fallbackPort;
+    }
+
+    public void ShutdownDedicatedServer()
+    {
+        if (isShuttingDown)
+            return;
+
+        isShuttingDown = true;
+
+        Debug.Log("Dedicated Server shutdown requested.");
+
+        if (networkManager != null && networkManager.IsListening)
+        {
+            networkManager.Shutdown();
+        }
+
+        Debug.Log("Dedicated Server process will exit.");
+
+        Application.Quit(0);
     }
 
 #endif

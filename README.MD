@@ -81,7 +81,23 @@ PostgreSQL / Redis
 ⚠️ 문제 발생
 🔁 수정 중
 ```
+### 현재 진행 중인 작업
 
+#### AWS EC2 Dedicated Server 환경 구축
+
+Unity Linux Dedicated Server 빌드를 AWS EC2 Ubuntu 환경에 배포하고,  
+외부 네트워크의 클라이언트가 접속할 수 있는 환경을 구성하고 있습니다.
+
+현재 상태: **AWS 계정 활성화 완료 및 EC2 환경 구성 진행 중**
+
+- [ ] Unity에서 Linux Dedicated Server 빌드 생성
+- [ ] AWS EC2 Ubuntu VM 생성
+- [ ] EC2 보안 그룹에 게임 서버 포트 개방
+- [ ] SSH를 통한 Ubuntu VM 접속
+- [ ] Linux 서버 빌드 파일 업로드
+- [ ] EC2에서 PongServer 실행
+- [ ] Windows 클라이언트에서 EC2 퍼블릭 IPv4로 접속
+- [ ] Android 클라이언트와 크로스플레이 검증
 ---
 
 ## 현재 문제 상황

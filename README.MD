@@ -90,7 +90,7 @@ Unity Linux Dedicated Server 빌드를 AWS EC2 Ubuntu 환경에 배포하고,
 
 현재 상태: **AWS 계정 활성화 완료 및 EC2 환경 구성 진행 중**
 
-- [ ] Unity에서 Linux Dedicated Server 빌드 생성
+- [x] Unity에서 Linux Dedicated Server 빌드 생성
 - [ ] AWS EC2 Ubuntu VM 생성
 - [ ] EC2 보안 그룹에 게임 서버 포트 개방
 - [ ] SSH를 통한 Ubuntu VM 접속

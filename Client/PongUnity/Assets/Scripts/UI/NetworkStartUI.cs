@@ -1,15 +1,19 @@
+using TMPro;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Unity.Netcode.Transports.UTP;
 
 public class NetworkStartUI : MonoBehaviour
 {
-    [Header("Client Connection Settings")]
-    [SerializeField] private string serverAddress = "127.0.0.1";
-    [SerializeField] private ushort serverPort = 7777;
+    //[Header("Client Connection Settings")]
+    //[SerializeField] private string serverAddress = "127.0.0.1";
+    //[SerializeField] private ushort serverPort = 7777;
 
     [SerializeField] private UnityTransport unityTransport;
+    [SerializeField] private GameObject ServerAddressInputOBJ;
+    [SerializeField] private TMP_InputField addressInputField;
+    [SerializeField] private TMP_InputField portInputField;
 
     void Start()
     {
@@ -33,10 +37,39 @@ public class NetworkStartUI : MonoBehaviour
         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
         //NetworkManager.Singleton.OnServerStarted -= OnServerStarted;
     }
-
-    public void StartClient()
+    public void OnClickStartButton()
     {
-        bool result = Connect(serverAddress, serverPort);
+        ServerAddressInputOBJ.gameObject.SetActive(true);
+    }
+
+    public void OnClickOffButton()
+    {
+        ServerAddressInputOBJ.gameObject.SetActive(false);
+    }
+
+    public void OnClickConnectButton()
+    {
+        if (addressInputField == null || portInputField == null)
+        {
+            Debug.LogError("Server address or port input field is missing.");
+            return;
+        }
+
+        string address = addressInputField.text.Trim();
+
+        if (string.IsNullOrWhiteSpace(address))
+        {
+            Debug.LogError("Server address is empty.");
+            return;
+        }
+
+        if (!ushort.TryParse(portInputField.text.Trim(), out ushort port))
+        {
+            Debug.LogError("Server port must be between 0 and 65535.");
+            return;
+        }
+
+        Connect(address, port);
     }
 
     public bool Connect(string address, ushort port)

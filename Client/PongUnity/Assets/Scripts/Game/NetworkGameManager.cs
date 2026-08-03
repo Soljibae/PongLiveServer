@@ -51,8 +51,6 @@ public class NetworkGameManager : NetworkBehaviour
 
     private readonly Dictionary<ulong, NetworkObject> spawnedControllers = new();
 
-    private bool hasHadPlayer = false;
-
     private DedicatedServerBootstrap dedicatedServerBootstrap;
 
     private int requiredPlayerCount = 2;
@@ -167,8 +165,6 @@ public class NetworkGameManager : NetworkBehaviour
     {
         if (!IsServer)
             return;
-
-        hasHadPlayer = true;
 
         Debug.Log($"Client connected: {clientId}");
 
@@ -606,6 +602,8 @@ public class NetworkGameManager : NetworkBehaviour
 
         Debug.Log("Match ended. Shutting down server.");
 
+    #if UNITY_SERVER
         dedicatedServerBootstrap.ShutdownDedicatedServer();
+    #endif
     }
 }

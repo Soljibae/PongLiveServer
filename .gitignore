@@ -5,6 +5,11 @@
 #
 # Based on Unity.gitignore
 #
+
+# =========================
+# Unity
+# =========================
+
 /Client/PongUnity/.utmp/
 /Client/PongUnity/[Ll]ibrary/
 /Client/PongUnity/[Tt]emp/
@@ -79,3 +84,29 @@
 
 # Build outputs
 /[Bb]uilds/
+
+
+# =========================
+# ASP.NET Core / .NET
+# =========================
+
+# Build results
+**/[Bb]in/
+**/[Oo]bj/
+
+# Visual Studio user-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local environment / secret files
+.env
+.env.*
+!.env.example
+**/appsettings.Local.json
+
+# Certificates / private keys
+*.pfx
+*.p12

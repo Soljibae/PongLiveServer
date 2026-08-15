@@ -1,0 +1,6 @@
+@PongBackend_HostAddress = http://localhost:5109
+
+GET {{PongBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

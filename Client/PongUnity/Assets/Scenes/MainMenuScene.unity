@@ -6192,6 +6192,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7ddb76132fe0744dab7a53085cffaa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  accountApiClient: {fileID: 1397647602}
   idInputField: {fileID: 480110591}
   idStatusText: {fileID: 1591998250}
   idDuplicateCheckButton: {fileID: 1890067753}
@@ -6219,6 +6220,7 @@ GameObject:
   - component: {fileID: 1397647599}
   - component: {fileID: 1397647600}
   - component: {fileID: 1397647601}
+  - component: {fileID: 1397647602}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -6355,6 +6357,19 @@ MonoBehaviour:
   defaultPort: 7777
   networkManager: {fileID: 1397647597}
   unityTransport: {fileID: 1397647596}
+--- !u!114 &1397647602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397647595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1779c7fdb21a53a4faf9d4af8bbd0df1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  apiBaseUrl: https://localhost:7257
 --- !u!1 &1441928461
 GameObject:
   m_ObjectHideFlags: 0
@@ -6437,7 +6452,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1441928464}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1393102354}
+        m_TargetAssemblyTypeName: SignUpUI, Assembly-CSharp
+        m_MethodName: OnClickNicknameDuplicateCheck
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1441928464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8840,7 +8867,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1890067754}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1393102354}
+        m_TargetAssemblyTypeName: SignUpUI, Assembly-CSharp
+        m_MethodName: OnClickIdDuplicateCheck
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1890067754
 MonoBehaviour:
   m_ObjectHideFlags: 0

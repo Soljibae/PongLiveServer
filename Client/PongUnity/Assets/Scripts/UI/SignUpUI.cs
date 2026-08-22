@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class SignUpUI : MonoBehaviour
 {
+    [SerializeField] private AccountApiClient accountApiClient;
+
     [Header("ID")]
     [SerializeField] private TMP_InputField idInputField;
     [SerializeField] private TMP_Text idStatusText;
@@ -295,6 +297,106 @@ public class SignUpUI : MonoBehaviour
         signUpResultPanel.SetActive(false);
 
         ResetUI();
+    }
+
+    public void OnClickIdDuplicateCheck()
+    {
+        string id = idInputField.text;
+
+        StartCoroutine(
+            accountApiClient.CheckId(
+                id,
+                OnIdCheckCompleted,
+                OnIdCheckError
+            )
+        );
+    }
+
+    private void OnIdCheckCompleted(
+    bool available,
+    string message)
+    {
+        isIdDuplicateChecked = available;
+
+        if (available)
+        {
+            idDuplicateCheckButton.interactable = false;
+        }
+
+        SetStatusText(
+            idStatusText,
+            message,
+            available
+                ? InputStatus.Valid
+                : InputStatus.Invalid
+        );
+
+        UpdateSignUpButtonState();
+    }
+
+    private void OnIdCheckError(string error)
+    {
+        isIdDuplicateChecked = false;
+
+        SetStatusText(
+            idStatusText,
+            "Failed to check ID.",
+            InputStatus.Invalid
+        );
+
+        Debug.LogError(error);
+
+        UpdateSignUpButtonState();
+    }
+
+    public void OnClickNicknameDuplicateCheck()
+    {
+        string nickname = nicknameInputField.text;
+
+        StartCoroutine(
+            accountApiClient.CheckNickname(
+                nickname,
+                OnNicknameCheckCompleted,
+                OnNicknameCheckError
+            )
+        );
+    }
+
+    private void OnNicknameCheckCompleted(
+    bool available,
+    string message)
+    {
+        isNicknameDuplicateChecked = available;
+
+        if(available)
+        {
+            nicknameDuplicateCheckButton.interactable = false;
+        }
+
+        SetStatusText(
+            nicknameStatusText,
+            message,
+            available
+                ? InputStatus.Valid
+                : InputStatus.Invalid
+        );
+
+        UpdateSignUpButtonState();
+    }
+
+    private void OnNicknameCheckError(string error)
+    {
+        isNicknameDuplicateChecked = false;
+
+        SetStatusText(
+            nicknameStatusText,
+            "Failed to check nickname.",
+            InputStatus.Invalid
+        );
+
+        Debug.LogError(error);
+
+        UpdateSignUpButtonState();
     }
 
     private void UpdateSignUpButtonState()

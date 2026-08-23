@@ -1,9 +1,11 @@
-﻿using PongBackend.Data;
-using PongBackend.DTOs.Auth;
-using PongBackend.Rules;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using PongBackend.Data;
+using PongBackend.DTOs.Auth;
+using PongBackend.Models;
+using PongBackend.Rules;
 
 namespace PongBackend.Controllers
 {
@@ -13,9 +15,13 @@ namespace PongBackend.Controllers
     {
         private readonly AppDbContext _dbContext;
 
-        public AuthController(AppDbContext dbContext)
+        private readonly PasswordHasher<User> _passwordHasher;
+
+        public AuthController(AppDbContext dbContext, 
+            PasswordHasher<User> passwordHasher)
         {
             _dbContext = dbContext;
+            _passwordHasher = passwordHasher;
         }
 
         [EnableRateLimiting("AccountCheck")]
@@ -92,6 +98,119 @@ namespace PongBackend.Controllers
             {
                 Available = true,
                 Message = "Nickname is available."
+            });
+        }
+
+        [EnableRateLimiting("AccountSignUp")]
+        [HttpPost("signup")]
+        public async Task<IActionResult> SignUp(
+            [FromBody] SignUpRequest request)
+        {
+            bool isIdValid = IsAlphaNumeric(
+                request.Id,
+                AccountRules.IdMinLength,
+                AccountRules.IdMaxLength
+            );
+
+            bool isPasswordValid = IsAlphaNumeric(
+                request.Password,
+                AccountRules.PasswordMinLength,
+                AccountRules.PasswordMaxLength
+            );
+
+            bool isNicknameValid = IsAlphaNumeric(
+                request.Nickname,
+                AccountRules.NicknameMinLength,
+                AccountRules.NicknameMaxLength
+            );
+
+            if (!isIdValid)
+            {
+                return BadRequest(new SignUpResponse
+                {
+                    Success = false,
+                    Message = "Invalid ID format."
+                });
+            }
+
+            if (!isPasswordValid)
+            {
+                return BadRequest(new SignUpResponse
+                {
+                    Success = false,
+                    Message = "Invalid password format."
+                });
+            }
+
+            if (!isNicknameValid)
+            {
+                return BadRequest(new SignUpResponse
+                {
+                    Success = false,
+                    Message = "Invalid nickname format."
+                });
+            }
+
+            bool idExists = await _dbContext.Users
+                .AnyAsync(user => user.LoginId == request.Id);
+
+            if (idExists)
+            {
+                return Conflict(new SignUpResponse
+                {
+                    Success = false,
+                    Message = "ID is already in use."
+                });
+            }
+
+            bool nicknameExists = await _dbContext.Users
+                .AnyAsync(user => user.Nickname == request.Nickname);
+
+            if (nicknameExists)
+            {
+                return Conflict(new SignUpResponse
+                {
+                    Success = false,
+                    Message = "Nickname is already in use."
+                });
+            }
+
+            User user = new User
+            {
+                LoginId = request.Id,
+                Nickname = request.Nickname,
+                CreatedAt = DateTime.UtcNow,
+                Wins = 0,
+                Losses = 0
+            };
+
+            user.PasswordHash =
+                _passwordHasher.HashPassword(
+                    user,
+                    request.Password
+                );
+
+            try
+            {
+                _dbContext.Users.Add(user);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new SignUpResponse
+                    {
+                        Success = false,
+                        Message = "Failed to create account."
+                    }
+                );
+            }
+
+            return Ok(new SignUpResponse
+            {
+                Success = true,
+                Message = "Sign up successful."
             });
         }
 

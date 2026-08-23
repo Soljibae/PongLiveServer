@@ -3919,7 +3919,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 873057304}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1393102354}
+        m_TargetAssemblyTypeName: SignUpUI, Assembly-CSharp
+        m_MethodName: OnSignUpSubmitClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &873057304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5915,8 +5927,8 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 0
-  m_InputType: 0
+  m_ContentType: 7
+  m_InputType: 2
   m_AsteriskChar: 42
   m_KeyboardType: 0
   m_LineType: 0
@@ -6203,6 +6215,7 @@ MonoBehaviour:
   nicknameStatusText: {fileID: 728798245}
   nicknameDuplicateCheckButton: {fileID: 1441928463}
   signUpButton: {fileID: 873057303}
+  signUpSubmitButton: {fileID: 0}
   signUpResultText: {fileID: 153088458}
   signUpPanel: {fileID: 354322100}
   signUpResultPanel: {fileID: 1225781639}
@@ -6455,7 +6468,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1393102354}
         m_TargetAssemblyTypeName: SignUpUI, Assembly-CSharp
-        m_MethodName: OnClickNicknameDuplicateCheck
+        m_MethodName: OnNicknameDuplicateCheckClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8870,7 +8883,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1393102354}
         m_TargetAssemblyTypeName: SignUpUI, Assembly-CSharp
-        m_MethodName: OnClickIdDuplicateCheck
+        m_MethodName: OnIdDuplicateCheckClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9005,8 +9018,8 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 0
-  m_InputType: 0
+  m_ContentType: 7
+  m_InputType: 2
   m_AsteriskChar: 42
   m_KeyboardType: 0
   m_LineType: 0

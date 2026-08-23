@@ -24,6 +24,7 @@ public class SignUpUI : MonoBehaviour
 
     [Header("Sign Up")]
     [SerializeField] private Button signUpButton;
+    [SerializeField] private Button signUpSubmitButton;
     [SerializeField] private TMP_Text signUpResultText;
 
     [SerializeField] private GameObject signUpPanel;
@@ -299,7 +300,7 @@ public class SignUpUI : MonoBehaviour
         ResetUI();
     }
 
-    public void OnClickIdDuplicateCheck()
+    public void OnIdDuplicateCheckClicked()
     {
         string id = idInputField.text;
 
@@ -349,7 +350,7 @@ public class SignUpUI : MonoBehaviour
         UpdateSignUpButtonState();
     }
 
-    public void OnClickNicknameDuplicateCheck()
+    public void OnNicknameDuplicateCheckClicked()
     {
         string nickname = nicknameInputField.text;
 
@@ -397,6 +398,55 @@ public class SignUpUI : MonoBehaviour
         Debug.LogError(error);
 
         UpdateSignUpButtonState();
+    }
+
+    public void OnSignUpSubmitClicked()
+    {
+        signUpSubmitButton.interactable = false;
+
+        string id = idInputField.text;
+        string password = passwordInputField.text;
+        string nickname = nicknameInputField.text;
+
+        StartCoroutine(
+            accountApiClient.SignUp(
+                id,
+                password,
+                nickname,
+                OnSignUpCompleted,
+                OnSignUpError
+            )
+        );
+    }
+
+    private void OnSignUpCompleted(
+    bool success,
+    string message)
+    {
+        signUpResultPanel.SetActive(true);
+        signUpResultText.text = message;
+
+        if (success)
+        {
+            signUpResultText.color = validColor;
+            signUpPanel.SetActive(false);
+        }
+        else
+        {
+            signUpResultText.color = invalidColor;
+
+            ResetUI();
+        }
+    }
+
+    private void OnSignUpError(string error)
+    {
+        signUpResultPanel.SetActive(true);
+        signUpResultText.text = "Sign up failed.";
+
+        ResetUI();
+
+        Debug.LogError(error);
     }
 
     private void UpdateSignUpButtonState()

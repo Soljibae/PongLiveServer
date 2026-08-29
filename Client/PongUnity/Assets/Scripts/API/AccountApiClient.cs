@@ -32,6 +32,22 @@ public class AccountApiClient : MonoBehaviour
         public string message;
     }
 
+    [Serializable]
+    public class LoginRequest
+    {
+        public string id;
+        public string password;
+    }
+
+    [Serializable]
+    public class LoginResponse
+    {
+        public bool success;
+        public string message;
+        public string token;
+        public string nickname;
+    }
+
     public IEnumerator CheckId(
         string id,
         Action<bool, string> onCompleted,
@@ -149,5 +165,60 @@ public class AccountApiClient : MonoBehaviour
             response.success,
             response.message
         );
+    }
+
+    public IEnumerator Login(
+    string id,
+    string password,
+    Action<LoginResponse> onCompleted,
+    Action<string> onError)
+    {
+        string url = $"{apiBaseUrl}/api/auth/login";
+
+        LoginRequest requestData = new LoginRequest
+        {
+            id = id,
+            password = password
+        };
+
+        string json = JsonUtility.ToJson(requestData);
+
+        using UnityWebRequest request =
+            new UnityWebRequest(
+                url,
+                UnityWebRequest.kHttpVerbPOST
+            );
+
+        byte[] bodyRaw =
+            System.Text.Encoding.UTF8.GetBytes(json);
+
+        request.uploadHandler =
+            new UploadHandlerRaw(bodyRaw);
+
+        request.downloadHandler =
+            new DownloadHandlerBuffer();
+
+        request.SetRequestHeader(
+            "Content-Type",
+            "application/json"
+        );
+
+        yield return request.SendWebRequest();
+
+        if (!string.IsNullOrEmpty(request.downloadHandler.text))
+        {
+            LoginResponse response =
+                JsonUtility.FromJson<LoginResponse>(
+                    request.downloadHandler.text
+                );
+
+            if (response != null)
+            {
+                onCompleted?.Invoke(response);
+                yield break;
+            }
+        }
+
+        onError?.Invoke(request.error);
     }
 }

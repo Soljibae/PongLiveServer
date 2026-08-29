@@ -214,6 +214,75 @@ namespace PongBackend.Controllers
             });
         }
 
+        [EnableRateLimiting("AccountLogin")]
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(
+            [FromBody] LoginRequest request)
+        {
+            bool isIdValid = IsAlphaNumeric(
+                request.Id,
+                AccountRules.IdMinLength,
+                AccountRules.IdMaxLength
+            );
+
+            bool isPasswordValid = IsAlphaNumeric(
+                request.Password,
+                AccountRules.PasswordMinLength,
+                AccountRules.PasswordMaxLength
+            );
+
+            if (!isIdValid || !isPasswordValid)
+            {
+                return Unauthorized(new LoginResponse
+                {
+                    Success = false,
+                    Message = "Invalid ID or password."
+                });
+            }
+
+            User? user = await _dbContext.Users
+                .FirstOrDefaultAsync(
+                    user => user.LoginId == request.Id
+                );
+
+            if (user == null)
+            {
+                return Unauthorized(new LoginResponse
+                {
+                    Success = false,
+                    Message = "Invalid ID or password."
+                });
+            }
+
+            PasswordVerificationResult result =
+                _passwordHasher.VerifyHashedPassword(
+                    user,
+                    user.PasswordHash,
+                    request.Password
+                );
+
+            if (result == PasswordVerificationResult.Failed)
+            {
+                return Unauthorized(new LoginResponse
+                {
+                    Success = false,
+                    Message = "Invalid ID or password."
+                });
+            }
+
+            string token = "...";
+
+            return Ok(new LoginResponse
+            {
+                Success = true,
+                Message = "Login successful.",
+                Token = token,
+                Nickname = user.Nickname
+            });
+        }
+
+
+
         private static bool IsAlphaNumeric(
             string value,
             int minLength,

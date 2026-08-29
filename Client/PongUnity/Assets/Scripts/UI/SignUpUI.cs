@@ -24,7 +24,6 @@ public class SignUpUI : MonoBehaviour
 
     [Header("Sign Up")]
     [SerializeField] private Button signUpButton;
-    [SerializeField] private Button signUpSubmitButton;
     [SerializeField] private TMP_Text signUpResultText;
 
     [SerializeField] private GameObject signUpPanel;
@@ -402,7 +401,7 @@ public class SignUpUI : MonoBehaviour
 
     public void OnSignUpSubmitClicked()
     {
-        signUpSubmitButton.interactable = false;
+        signUpButton.interactable = false;
 
         string id = idInputField.text;
         string password = passwordInputField.text;

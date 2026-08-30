@@ -10,10 +10,15 @@ public class NetworkStartUI : MonoBehaviour
     //[SerializeField] private string serverAddress = "127.0.0.1";
     //[SerializeField] private ushort serverPort = 7777;
 
-    [SerializeField] private UnityTransport unityTransport;
+    private UnityTransport unityTransport;
     [SerializeField] private GameObject ServerAddressInputOBJ;
     [SerializeField] private TMP_InputField addressInputField;
     [SerializeField] private TMP_InputField portInputField;
+
+    private void Awake()
+    {
+        unityTransport = NetworkManagerInstance.Instance.UnityTransport;
+    }
 
     void Start()
     {

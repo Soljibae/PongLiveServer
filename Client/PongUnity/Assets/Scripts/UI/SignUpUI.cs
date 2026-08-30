@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class SignUpUI : MonoBehaviour
 {
-    [SerializeField] private AccountApiClient accountApiClient;
+    private AccountApiClient accountApiClient;
+    [SerializeField] private PopUpUI popUpUI;
 
     [Header("ID")]
     [SerializeField] private TMP_InputField idInputField;
@@ -24,10 +25,7 @@ public class SignUpUI : MonoBehaviour
 
     [Header("Sign Up")]
     [SerializeField] private Button signUpButton;
-    [SerializeField] private TMP_Text signUpResultText;
-
     [SerializeField] private GameObject signUpPanel;
-    [SerializeField] private GameObject signUpResultPanel;
 
     private enum InputStatus
     {
@@ -51,6 +49,8 @@ public class SignUpUI : MonoBehaviour
 
     private void Awake()
     {
+        accountApiClient = NetworkManagerInstance.Instance.AccountApiClient;
+
         idInputField.onValueChanged.AddListener(OnIdChanged);
 
         passwordInputField.onValueChanged.AddListener(OnPasswordChanged);
@@ -292,13 +292,6 @@ public class SignUpUI : MonoBehaviour
         ResetUI();
     }
 
-    public void OnOKButtonClicked()
-    {
-        signUpResultPanel.SetActive(false);
-
-        ResetUI();
-    }
-
     public void OnIdDuplicateCheckClicked()
     {
         string id = idInputField.text;
@@ -422,26 +415,23 @@ public class SignUpUI : MonoBehaviour
     bool success,
     string message)
     {
-        signUpResultPanel.SetActive(true);
-        signUpResultText.text = message;
+        popUpUI.gameObject.SetActive(true);
+        popUpUI.popUpText.text = message;
 
         if (success)
         {
-            signUpResultText.color = validColor;
             signUpPanel.SetActive(false);
         }
         else
         {
-            signUpResultText.color = invalidColor;
-
             ResetUI();
         }
     }
 
     private void OnSignUpError(string error)
     {
-        signUpResultPanel.SetActive(true);
-        signUpResultText.text = "Sign up failed.";
+        popUpUI.gameObject.SetActive(true);
+        popUpUI.popUpText.text = "Sign up failed.";
 
         ResetUI();
 
@@ -526,12 +516,6 @@ public class SignUpUI : MonoBehaviour
             "Check nickname availability.",
             InputStatus.Default
         );
-
-        if (signUpResultText != null)
-        {
-            signUpResultText.text = string.Empty;
-            signUpResultText.color = defaultColor;
-        }
 
         isIdValid = false;
         isIdDuplicateChecked = false;

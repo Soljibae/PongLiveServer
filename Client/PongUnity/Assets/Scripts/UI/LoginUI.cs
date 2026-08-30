@@ -1,21 +1,19 @@
 using Assets.Scripts.Rule;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.UI;
 using static AccountApiClient;
 
 public class LoginUI : MonoBehaviour
 {
-    [SerializeField] private AccountApiClient accountApiClient;
+    private AccountApiClient accountApiClient;
     [SerializeField] private TMP_InputField idInputField;
     [SerializeField] private TMP_InputField passwordInputField;
     [SerializeField] private Button loginButton;
     [SerializeField] private Button loginRequestButton;
     [SerializeField] private Button multiPlayButton;
-    [SerializeField] private TMP_Text loginResultText;
     [SerializeField] private GameObject loginPanel;
-    [SerializeField] private GameObject loginResultPanel;
+    [SerializeField] private PopUpUI popUpUI;
 
     private bool isIdValid;
     private bool isPasswordValid;
@@ -27,9 +25,17 @@ public class LoginUI : MonoBehaviour
 
     private void Awake()
     {
+        accountApiClient = NetworkManagerInstance.Instance.AccountApiClient;
+
         idInputField.onValueChanged.AddListener(OnIdChanged);
 
         passwordInputField.onValueChanged.AddListener(OnPasswordChanged);
+
+        if(AuthManager.Instance.IsLoggedIn)
+        {
+            loginButton.gameObject.SetActive(false);
+            multiPlayButton.gameObject.SetActive(true);
+        }
     }
 
     private void OnDestroy()
@@ -46,13 +52,6 @@ public class LoginUI : MonoBehaviour
     public void OnLoginOffButtonClicked()
     {
         loginPanel.SetActive(false);
-
-        ResetUI();
-    }
-
-    public void OnOKButtonClicked()
-    {
-        loginResultPanel.SetActive(false);
 
         ResetUI();
     }
@@ -76,8 +75,8 @@ public class LoginUI : MonoBehaviour
 
     private void OnLoginCompleted(LoginResponse response)
     {
-        loginResultPanel.SetActive(true);
-        loginResultText.text = response.message;
+        popUpUI.gameObject.SetActive(true);
+        popUpUI.popUpText.text = response.message;
 
         if (response.success)
         {
@@ -87,6 +86,11 @@ public class LoginUI : MonoBehaviour
 
             Debug.Log($"Login successful: {response.nickname}");
             Debug.Log($"Token: {response.token}");
+
+            AuthManager.Instance.SetLoginInfo(
+                response.token,
+                response.nickname
+            );
         }
         else
         {
@@ -96,8 +100,8 @@ public class LoginUI : MonoBehaviour
 
     private void OnLoginError(string error)
     {
-        loginResultPanel.SetActive(true);
-        loginResultText.text = "Login failed.";
+        popUpUI.gameObject.SetActive(true);
+        popUpUI.popUpText.text = "Login failed.";
 
         ResetUI();
 

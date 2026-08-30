@@ -1254,6 +1254,7 @@ MonoBehaviour:
   keyboardInput: {fileID: 2053985182}
   mobileTouchInput: {fileID: 503157017}
   localPlayerSide: 1
+  cameraHalfHeight: 5
 --- !u!4 &1090537994
 Transform:
   m_ObjectHideFlags: 0

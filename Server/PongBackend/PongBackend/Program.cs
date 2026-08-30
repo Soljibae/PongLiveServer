@@ -1,7 +1,11 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PongBackend.Data;
 using PongBackend.Models;
+using PongBackend.Services;
+using System.Text;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +20,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddScoped<PasswordHasher<User>>();
+
+builder.Services.AddScoped<JwtTokenService>();
 
 builder.Services.AddOpenApi();
 
@@ -70,6 +76,49 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
+string jwtKey =
+    builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException(
+        "JWT Key was not found."
+    );
+
+string jwtIssuer =
+    builder.Configuration["Jwt:Issuer"]
+    ?? throw new InvalidOperationException(
+        "JWT Issuer was not found."
+    );
+
+string jwtAudience =
+    builder.Configuration["Jwt:Audience"]
+    ?? throw new InvalidOperationException(
+        "JWT Audience was not found."
+    );
+
+builder.Services
+    .AddAuthentication(
+        JwtBearerDefaults.AuthenticationScheme
+    )
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+
+                ValidIssuer = jwtIssuer,
+                ValidAudience = jwtAudience,
+
+                IssuerSigningKey =
+                    new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtKey)
+                    )
+            };
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -79,6 +128,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRateLimiter();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

@@ -6,6 +6,7 @@ using PongBackend.Data;
 using PongBackend.DTOs.Auth;
 using PongBackend.Models;
 using PongBackend.Rules;
+using PongBackend.Services;
 
 namespace PongBackend.Controllers
 {
@@ -17,11 +18,16 @@ namespace PongBackend.Controllers
 
         private readonly PasswordHasher<User> _passwordHasher;
 
-        public AuthController(AppDbContext dbContext, 
-            PasswordHasher<User> passwordHasher)
+        private readonly JwtTokenService _jwtTokenService;
+
+        public AuthController(
+            AppDbContext dbContext,
+            PasswordHasher<User> passwordHasher,
+            JwtTokenService jwtTokenService)
         {
             _dbContext = dbContext;
             _passwordHasher = passwordHasher;
+            _jwtTokenService = jwtTokenService;
         }
 
         [EnableRateLimiting("AccountCheck")]
@@ -269,8 +275,7 @@ namespace PongBackend.Controllers
                     Message = "Invalid ID or password."
                 });
             }
-
-            string token = "...";
+            string token = _jwtTokenService.CreateToken(user.UserId.ToString(), "user");
 
             return Ok(new LoginResponse
             {

@@ -5,9 +5,11 @@ public class NetworkManagerInstance : MonoBehaviour
 {
     [SerializeField] private UnityTransport unityTransport;
     [SerializeField] private AccountApiClient accountApiClient;
+    [SerializeField] private RankingApiClient rankingApiClient;
 
     public UnityTransport UnityTransport => unityTransport;
     public AccountApiClient AccountApiClient => accountApiClient;
+    public RankingApiClient RankingApiClient => rankingApiClient;
 
     public static NetworkManagerInstance Instance { get; private set; }
 

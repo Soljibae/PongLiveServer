@@ -25,5 +25,9 @@ namespace PongBackend.Models
 
         [Column("losses")]
         public int Losses { get; set; }
+
+        [Column("ranking_score")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public int RankingScore { get; private set; }
     }
 }

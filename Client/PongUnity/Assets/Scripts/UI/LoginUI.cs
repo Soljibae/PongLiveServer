@@ -12,6 +12,8 @@ public class LoginUI : MonoBehaviour
     [SerializeField] private Button loginButton;
     [SerializeField] private Button loginRequestButton;
     [SerializeField] private Button multiPlayButton;
+    [SerializeField] private Button signUpButton;
+    [SerializeField] private Button rankingButton;
     [SerializeField] private GameObject loginPanel;
     [SerializeField] private PopUpUI popUpUI;
 
@@ -34,7 +36,9 @@ public class LoginUI : MonoBehaviour
         if(AuthManager.Instance.IsLoggedIn)
         {
             loginButton.gameObject.SetActive(false);
+            signUpButton.gameObject.SetActive(false);
             multiPlayButton.gameObject.SetActive(true);
+            rankingButton.gameObject.SetActive(true);
         }
     }
 
@@ -82,7 +86,9 @@ public class LoginUI : MonoBehaviour
         {
             loginPanel.SetActive(false);
             loginButton.gameObject.SetActive(false);
+            signUpButton.gameObject.SetActive(false);
             multiPlayButton.gameObject.SetActive(true);
+            rankingButton.gameObject.SetActive(true);
 
             Debug.Log($"Login successful: {response.nickname}");
             Debug.Log($"Token: {response.token}");

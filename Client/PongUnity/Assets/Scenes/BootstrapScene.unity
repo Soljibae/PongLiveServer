@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 619227818}
   - component: {fileID: 619227817}
   - component: {fileID: 619227824}
+  - component: {fileID: 619227825}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -298,6 +299,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   unityTransport: {fileID: 619227821}
   accountApiClient: {fileID: 619227817}
+  rankingApiClient: {fileID: 619227825}
+--- !u!114 &619227825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 619227816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80c4292f4c3164f489c34f6be8b4f741, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  apiBaseUrl: https://localhost:7257
 --- !u!1 &899165391
 GameObject:
   m_ObjectHideFlags: 0
